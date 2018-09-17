@@ -5,6 +5,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 use App\Models\Entity\Usuario;
 use App\Models\Entity\Perfil;
+use App\Models\Entity\Profissional;
 use Slim\App;
 use Slim\Container;
 use Doctrine\ORM\EntityManager;
@@ -47,7 +48,7 @@ $app->add(new TokenAuthentication([
  * Lista de todos os usuarios
  * @request curl -X GET http://localhost:8000/user
  */
-$app->get('/api/user', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->get('/api/usuario', function (Request $request, Response $response) use ($app,$entityManager) {
 
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
     $users = $usersRepository->findAll();
@@ -57,14 +58,34 @@ $app->get('/api/user', function (Request $request, Response $response) use ($app
     return $return;
 });
 
+$app->get('/api/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+    $users = $usersRepository->findAll();
+
+    $return = $response->withJson($users, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
 /**
  * Retornando mais informações do usuario informado pelo id
  * @request curl -X GET http://localhost:8000/user/1
  */
-$app->get('/api/user/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->get('/api/usuario/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
     $route = $request->getAttribute('route');
     $id = $route->getArgument('id');
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+    $user = $usersRepository->find($id);        
+
+    $return = $response->withJson($user, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+$app->get('/api/profissional/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('id');
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
     $user = $usersRepository->find($id);        
 
     $return = $response->withJson($user, 200)
@@ -76,7 +97,7 @@ $app->get('/api/user/{id}', function (Request $request, Response $response) use 
  * Cadastra um novo <Usuario></Usuario>
  * @request curl -X POST http://localhost:8000/user -H "Content-type: application/json" -d '{"name":"O Oceano no Fim do Caminho", "author":"Neil Gaiman"}'
  */
-$app->post('/api/user', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->post('/api/usuario', function (Request $request, Response $response) use ($app,$entityManager) {
 
     $params = (object) $request->getParams();
     
@@ -84,7 +105,7 @@ $app->post('/api/user', function (Request $request, Response $response) use ($ap
     $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
     $perfil = $perfilRepository->find($id);        
 
-    $user = new Usuario($params->usuario,$params->password, $perfil);
+    $user = new Usuario($params->nome,$params->password,$params->cep,$params->endereco,$params->bairro,$params->email,$params->telefone1,$params->telefone2,$params->cpf,$params->imagem, $perfil);
     
     /**
      * Persiste a entidade no banco de dados
@@ -98,6 +119,27 @@ $app->post('/api/user', function (Request $request, Response $response) use ($ap
     return $return;
 });
 
+$app->post('/api/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    $params = (object) $request->getParams();
+    
+    $id = $params->perfil;
+    $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
+    $perfil = $perfilRepository->find($id);        
+
+    $profissional = new Profissional($params->nome,$params->nome_fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$params->bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->rg,$params->imagem,$params->atividade_principal,$params->extra,$params->situacao_cadastral, $perfil);
+    
+    /**
+     * Persiste a entidade no banco de dados
+     */
+    $entityManager->persist($profissional);
+    $entityManager->flush();
+
+
+    $return = $response->withJson($profissional, 201)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
 /**
  * Atualiza os dados de um Usuario
  * @request curl -X PUT http://localhost:8000/user/14 -H "Content-type: application/json" -d '{"name":"Deuses Americanos", "author":"Neil Gaiman"}'
@@ -166,8 +208,12 @@ $app->delete('/api/user/{id}', function (Request $request, Response $response) u
 $app->post('/api/login', function (Request $request, Response $response) use ($app,$entityManager) {
     
         $params = (object) $request->getParams();
-    
-        $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+        $usersRepository = null;
+        if($params->perfil == "usuario"){
+            $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+        }elseif($params->perfil == "profissional"){
+            $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+        }
         $userBanco = $usersRepository->findOneBy(array('email' => $params->email));
       
         if(password_verify($params->password, $userBanco->getPassword())){
