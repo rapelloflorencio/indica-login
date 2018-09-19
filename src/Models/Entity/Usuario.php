@@ -61,16 +61,16 @@ class Usuario implements \JsonSerializable
     private $email;
 
      /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(type="integer", nullable=false)
+     * @ORM\Column(type="string", nullable=false)
      */
     private $telefone1;
 
     /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
     private $telefone2;
 
@@ -107,7 +107,7 @@ class Usuario implements \JsonSerializable
      */
      private $perfil;
    
-    public function __construct(string $nome, string $password, string $cep, string $endereco, string $bairro, string $email, integer $telefone1, integer $telefone2, string $cpf, string $imagem, ?Perfil $perfil)
+    public function __construct(string $nome, string $password, string $cep, string $endereco, string $bairro, string $email, string $telefone1, string $telefone2, string $cpf, string $imagem, ?Perfil $perfil)
     {
         $this->nome = $nome;
         $this->password = password_hash($password, PASSWORD_BCRYPT);
@@ -163,12 +163,12 @@ class Usuario implements \JsonSerializable
         return $this->email;
     }
 
-    public function getTelefone1(): integer
+    public function getTelefone1(): string
     {
         return $this->telefone1;
     }
 
-    public function getTelefone2(): integer
+    public function getTelefone2(): string
     {
         return $this->telefone2;
     }
@@ -263,7 +263,6 @@ class Usuario implements \JsonSerializable
             'telefone1' =>    $this->getTelefone1(),
             'telefone2' =>   $this->getTelefone2(),
             'cpf' =>   $this->getCpf(),
-            'imagem' =>   $this->getImagem(),
             'perfil' => $this->getPerfil()
         ];
     }

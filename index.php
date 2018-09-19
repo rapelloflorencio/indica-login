@@ -125,16 +125,16 @@ $app->post('/api/profissional', function (Request $request, Response $response) 
     
     $id = $params->perfil;
     $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
-    $perfil = $perfilRepository->find($id);        
+    $perfil = $perfilRepository->find($id);          
 
-    $profissional = new Profissional($params->nome,$params->nome_fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$params->bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->rg,$params->imagem,$params->atividade_principal,$params->extra,$params->situacao_cadastral, $perfil);
+    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$params->bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->rg,$params->imagem,$params->atividade_principal,$params->extra,$params->situacao_cadastral, $perfil);
     
     /**
      * Persiste a entidade no banco de dados
      */
     $entityManager->persist($profissional);
     $entityManager->flush();
-
+    
 
     $return = $response->withJson($profissional, 201)
         ->withHeader('Content-type', 'application/json');
@@ -144,7 +144,7 @@ $app->post('/api/profissional', function (Request $request, Response $response) 
  * Atualiza os dados de um Usuario
  * @request curl -X PUT http://localhost:8000/user/14 -H "Content-type: application/json" -d '{"name":"Deuses Americanos", "author":"Neil Gaiman"}'
  */
-$app->put('/api/user/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->put('/api/usuario/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
 
     /**
      * Pega o ID do Usuario informado na URL
@@ -180,7 +180,7 @@ $app->put('/api/user/{id}', function (Request $request, Response $response) use 
  * Deleta o Usuario informado pelo ID
  * @request curl -X DELETE http://localhost:8000/user/3
  */
-$app->delete('/api/user/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->delete('/api/usuario/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
     /**
      * Pega o ID do Usuario informado na URL
      */
@@ -237,6 +237,25 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
                 ->withHeader('Content-type', 'application/json');
             return $return;
         });
+    
+        $app->get('/api/perfil', function (Request $request, Response $response) use ($app,$entityManager) {
         
+            $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
+            $perfil = $perfilRepository->findAll();
+        
+            $return = $response->withJson($perfil, 200)
+                ->withHeader('Content-type', 'application/json');
+            return $return;
+        });
 
+        $app->get('/api/perfil/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+            $route = $request->getAttribute('route');
+            $id = $route->getArgument('id');
+            $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
+            $perfil = $perfilRepository->find($id);        
+        
+            $return = $response->withJson($perfil, 200)
+                ->withHeader('Content-type', 'application/json');
+            return $return;
+        });
 $app->run();

@@ -35,7 +35,7 @@ class Profissional implements \JsonSerializable
     /**
      * @var string
      *
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\Column(type="string")
      */
     private $nome_fantasia;
      /**
@@ -55,7 +55,7 @@ class Profissional implements \JsonSerializable
     /**
      * @var string
      *
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $complemento;
 
@@ -74,58 +74,58 @@ class Profissional implements \JsonSerializable
     private $email;
 
      /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(type="integer", nullable=false)
+     * @ORM\Column(type="string", nullable=false)
      */
     private $telefone1;
 
     /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", nullable=false)
      */
     private $telefone2;
 
     /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $telefone3;
 
     /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $telefone4;
 
      /**
      * @var string
      *
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string", unique=true, nullable=true)
      */
     private $cpf;
 
      /**
      * @var string
      *
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string", unique=true, nullable=true)
      */
     private $cnpj;
 
      /**
      * @var string
      *
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string", unique=true, nullable=true)
      */
     private $rg;
 
      /**
      * @var string
      *
-     * @ORM\Column(type="blob")
+     * @ORM\Column(type="blob", nullable=true)
      */
     private $imagem;
 
@@ -169,7 +169,7 @@ class Profissional implements \JsonSerializable
      */
      private $perfil;
    
-    public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, string $bairro, string $email, integer $telefone1, integer $telefone2,integer $telefone3, integer $telefone4, string $cpf, string $cnpj, string $rg, string $imagem, string $atividade_principal, string $atividade_extra, string $situacao_cadastral, ?Perfil $perfil)
+    public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, string $bairro, string $email, string $telefone1, string $telefone2,string $telefone3, string $telefone4, string $cpf, string $cnpj, string $rg, string $imagem, string $atividade_principal, string $atividade_extra, string $situacao_cadastral, ?Perfil $perfil)
     {
         $this->nome = $nome;
         $this->nome_fantasia = $nome_fantasia;
@@ -241,22 +241,22 @@ class Profissional implements \JsonSerializable
         return $this->email;
     }
 
-    public function getTelefone1(): integer
+    public function getTelefone1(): string
     {
         return $this->telefone1;
     }
 
-    public function getTelefone2(): integer
+    public function getTelefone2(): string
     {
         return $this->telefone2;
     }
 
-    public function getTelefone3(): integer
+    public function getTelefone3(): string
     {
         return $this->telefone3;
     }
 
-    public function getTelefone4(): integer
+    public function getTelefone4(): string
     {
         return $this->telefone4;
     }
@@ -288,7 +288,7 @@ class Profissional implements \JsonSerializable
 
     public function getSituacao_cadastral(): string
     {
-        return $this->getSituacao_cadastral;
+        return $this->situacao_cadastral;
     }
 
     public function getImagem(): string
@@ -428,7 +428,6 @@ class Profissional implements \JsonSerializable
             'atividade_principal' => $this->getAtividade_principal(),
             'atividade_extra' => $this->getAtividade_Extra(),
             'situacao_cadastral' => $this->getSituacao_cadastral(),
-            'imagem' =>   $this->getImagem(),
             'perfil' => $this->getPerfil()
         ];
     }
