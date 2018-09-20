@@ -84,7 +84,7 @@ class Usuario implements \JsonSerializable
      /**
      * @var string
      *
-     * @ORM\Column(type="blob")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $imagem;
 
