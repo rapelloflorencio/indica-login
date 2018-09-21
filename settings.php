@@ -17,7 +17,7 @@ return [
                 'host' => '127.0.0.1',
                 'port' => 3306,
                 'dbname' => 'indicaer_des',
-                'user' => ' indicaer_admin',
+                'user' => 'indicaer_admin',
                 'password' => 'pegasus@123',
                 'charset' => 'UTF8'
             ]
