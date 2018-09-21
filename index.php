@@ -49,7 +49,7 @@ $app->add(new TokenAuthentication([
  * Lista de todos os usuarios
  * @request curl -X GET http://localhost:8000/user
  */
-$app->get('/index.php/api/usuario', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->get('/api/usuario', function (Request $request, Response $response) use ($app,$entityManager) {
 
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
     $users = $usersRepository->findAll();
@@ -59,7 +59,7 @@ $app->get('/index.php/api/usuario', function (Request $request, Response $respon
     return $return;
 });
 
-$app->get('/index.php/api/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->get('/api/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
 
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
     $users = $usersRepository->findAll();
@@ -72,7 +72,7 @@ $app->get('/index.php/api/profissional', function (Request $request, Response $r
  * Retornando mais informações do usuario informado pelo id
  * @request curl -X GET http://localhost:8000/user/1
  */
-$app->get('/index.php/api/usuario/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->get('/api/usuario/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
     $route = $request->getAttribute('route');
     $id = $route->getArgument('id');
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
@@ -83,7 +83,7 @@ $app->get('/index.php/api/usuario/{id}', function (Request $request, Response $r
     return $return;
 });
 
-$app->get('/index.php/api/profissional/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->get('/api/profissional/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
     $route = $request->getAttribute('route');
     $id = $route->getArgument('id');
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
@@ -98,7 +98,7 @@ $app->get('/index.php/api/profissional/{id}', function (Request $request, Respon
  * Cadastra um novo <Usuario></Usuario>
  * @request curl -X POST http://localhost:8000/user -H "Content-type: application/json" -d '{"name":"O Oceano no Fim do Caminho", "author":"Neil Gaiman"}'
  */
-$app->post('/index.php/api/usuario', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->post('/api/usuario', function (Request $request, Response $response) use ($app,$entityManager) {
 
     $params = (object) $request->getParams();
     
@@ -120,7 +120,7 @@ $app->post('/index.php/api/usuario', function (Request $request, Response $respo
     return $return;
 });
 
-$app->post('/index.php/api/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->post('/api/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
 
     $params = (object) $request->getParams();
     
@@ -145,7 +145,7 @@ $app->post('/index.php/api/profissional', function (Request $request, Response $
  * Atualiza os dados de um Usuario
  * @request curl -X PUT http://localhost:8000/user/14 -H "Content-type: application/json" -d '{"name":"Deuses Americanos", "author":"Neil Gaiman"}'
  */
-$app->put('/index.php/api/usuario/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->put('/api/usuario/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
 
     /**
      * Pega o ID do Usuario informado na URL
@@ -181,7 +181,7 @@ $app->put('/index.php/api/usuario/{id}', function (Request $request, Response $r
  * Deleta o Usuario informado pelo ID
  * @request curl -X DELETE http://localhost:8000/user/3
  */
-$app->delete('/index.php/api/usuario/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->delete('/api/usuario/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
     /**
      * Pega o ID do Usuario informado na URL
      */
@@ -206,7 +206,7 @@ $app->delete('/index.php/api/usuario/{id}', function (Request $request, Response
     return $return;
 });
 
-$app->post('/index.php/api/login', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->post('/api/login', function (Request $request, Response $response) use ($app,$entityManager) {
     
         $params = (object) $request->getParams();
         $usersRepository = null;
@@ -226,7 +226,7 @@ $app->post('/index.php/api/login', function (Request $request, Response $respons
         
     });
 
-    $app->post('/index.php/api/perfil', function (Request $request, Response $response) use ($app,$entityManager) {
+    $app->post('/api/perfil', function (Request $request, Response $response) use ($app,$entityManager) {
         
             $params = (object) $request->getParams();
             $perfil = new Perfil($params->nome);
@@ -239,7 +239,7 @@ $app->post('/index.php/api/login', function (Request $request, Response $respons
             return $return;
         });
     
-        $app->get('/index.php/api/perfil', function (Request $request, Response $response) use ($app,$entityManager) {
+        $app->get('/api/perfil', function (Request $request, Response $response) use ($app,$entityManager) {
         
             $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
             $perfil = $perfilRepository->findAll();
@@ -249,7 +249,7 @@ $app->post('/index.php/api/login', function (Request $request, Response $respons
             return $return;
         });
 
-        $app->get('/index.php/api/perfil/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+        $app->get('/api/perfil/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
             $route = $request->getAttribute('route');
             $id = $route->getArgument('id');
             $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
