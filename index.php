@@ -6,6 +6,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
 use App\Models\Entity\Usuario;
 use App\Models\Entity\Perfil;
 use App\Models\Entity\Profissional;
+use App\Models\Entity\AtividadeProfissional;
 use Slim\App;
 use Slim\Container;
 use Doctrine\ORM\EntityManager;
