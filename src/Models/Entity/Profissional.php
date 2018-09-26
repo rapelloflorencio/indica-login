@@ -6,6 +6,7 @@ namespace App\Models\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Models\Entity\Perfil;
+use App\Models\Entity\AtividadeProfissional;
 
 /**
  * The User class demonstrates how to annotate a simple
@@ -130,16 +131,12 @@ class Profissional implements \JsonSerializable
     private $imagem;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\AtividadeProfissional")
      */
     private $atividade_principal;
 
-     /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\AtividadeProfissional")
      */
     private $atividade_extra;
 
@@ -169,7 +166,7 @@ class Profissional implements \JsonSerializable
      */
      private $perfil;
    
-    public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, string $bairro, string $email, string $telefone1, string $telefone2,string $telefone3, string $telefone4, string $cpf, string $cnpj, string $rg, string $imagem, string $atividade_principal, string $atividade_extra, string $situacao_cadastral, ?Perfil $perfil)
+    public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, string $bairro, string $email, string $telefone1, string $telefone2,string $telefone3, string $telefone4, string $cpf, string $cnpj, string $rg, string $imagem, ?AtividadeProfissional $atividade_principal, ?AtividadeProfissional $atividade_extra, string $situacao_cadastral, ?Perfil $perfil)
     {
         $this->nome = $nome;
         $this->nome_fantasia = $nome_fantasia;
@@ -276,12 +273,12 @@ class Profissional implements \JsonSerializable
         return $this->rg;
     }
 
-    public function getAtividade_principal(): string
+    public function getAtividade_principal(): ?AtividadeProfissional
     {
         return $this->atividade_principal;
     }
 
-    public function getAtividade_Extra(): string
+    public function getAtividade_Extra(): ?AtividadeProfissional
     {
         return $this->atividade_extra;
     }

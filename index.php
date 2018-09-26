@@ -40,7 +40,7 @@ $authenticator = function($request, TokenAuthentication $tokenAuth){
  */
 $app->add(new TokenAuthentication([
     'path' =>   '/api',
-    'passthrough' => '/api/login',
+    'passthrough' => ['/api/login','/api/cadastro'],
     'authenticator' => $authenticator,
     'secure' => false
 ]));
@@ -98,7 +98,7 @@ $app->get('/api/profissional/{id}', function (Request $request, Response $respon
  * Cadastra um novo <Usuario></Usuario>
  * @request curl -X POST http://localhost:8000/user -H "Content-type: application/json" -d '{"name":"O Oceano no Fim do Caminho", "author":"Neil Gaiman"}'
  */
-$app->post('/api/usuario', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->post('/api/cadastro/usuario', function (Request $request, Response $response) use ($app,$entityManager) {
 
     $params = (object) $request->getParams();
     
@@ -120,7 +120,7 @@ $app->post('/api/usuario', function (Request $request, Response $response) use (
     return $return;
 });
 
-$app->post('/api/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->post('/api/cadastro/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
 
     $params = (object) $request->getParams();
     
@@ -128,7 +128,15 @@ $app->post('/api/profissional', function (Request $request, Response $response) 
     $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
     $perfil = $perfilRepository->find($id);          
 
-    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$params->bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->rg,$params->imagem,$params->atividade_principal,$params->extra,$params->situacao_cadastral, $perfil);
+    $id = $params->atividade_principal;
+    $atividadeRepository = $entityManager->getRepository('App\Models\Entity\AtividadeProfissional');
+    $atividade_principal = $atividadeRepository->find($id);
+    $id = $params->extra;
+    $extra = null;
+    if($id != ''){
+        $extra = $atividadeRepository->find($id);
+    }
+    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$params->bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->rg,$params->imagem,$atividade_principal,$extra,$params->situacao_cadastral, $perfil);
     
     /**
      * Persiste a entidade no banco de dados
@@ -256,6 +264,40 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
             $perfil = $perfilRepository->find($id);        
         
             $return = $response->withJson($perfil, 200)
+                ->withHeader('Content-type', 'application/json');
+            return $return;
+        });
+    
+        $app->post('/api/atividade', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+            $params = (object) $request->getParams();
+            $atividade = new AtividadeProfissional($params->nome);
+            
+            $entityManager->persist($atividade);
+            $entityManager->flush();
+               
+            $return = $response->withJson($atividade, 201)
+                ->withHeader('Content-type', 'application/json');
+            return $return;
+        });
+    
+    $app->get('/api/atividade', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+            $atividadeRepository = $entityManager->getRepository('App\Models\Entity\AtividadeProfissional');
+            $atividade = $atividadeRepository->findAll();
+        
+            $return = $response->withJson($atividade, 200)
+                ->withHeader('Content-type', 'application/json');
+            return $return;
+        });
+
+    $app->get('/api/atividade/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+            $route = $request->getAttribute('route');
+            $id = $route->getArgument('id');
+            $atividadeRepository = $entityManager->getRepository('App\Models\Entity\AtividadeProfissional');
+            $atividade = $atividadeRepository->find($id);        
+        
+            $return = $response->withJson($atividade, 200)
                 ->withHeader('Content-type', 'application/json');
             return $return;
         });
