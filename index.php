@@ -41,7 +41,7 @@ $authenticator = function($request, TokenAuthentication $tokenAuth){
  */
 $app->add(new TokenAuthentication([
     'path' =>   '/api',
-    'passthrough' => ['/api/login','/api/cadastro'],
+    'passthrough' => ['/api/login','/api/cadastro','/api/consulta/atividade','/api/validaSemSenha', '/api/alterarSenha/'],
     'authenticator' => $authenticator,
     'secure' => false
 ]));
@@ -186,6 +186,37 @@ $app->put('/api/usuario/{id}', function (Request $request, Response $response) u
     return $return;
 });
 
+$app->put('/api/alterarSenha/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    /**
+     * Pega o ID do Usuario informado na URL
+     */
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('id');
+
+    /**
+     * Encontra o Usuario no Banco
+     */ 
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+    $user = $usersRepository->find($id);   
+
+    /**
+     * Atualiza e Persiste o Usuario com os parâmetros recebidos no request
+     */
+    $user->setPassword($request->getParam('password'));
+
+    /**
+     * Persiste a entidade no banco de dados
+     */
+    $entityManager->persist($user);
+    $entityManager->flush();        
+
+    
+    $return = $response->withJson($user, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
 /**
  * Deleta o Usuario informado pelo ID
  * @request curl -X DELETE http://localhost:8000/user/3
@@ -219,7 +250,7 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
     
         $params = (object) $request->getParams();
         $usersRepository = null;
-        if($params->perfil == "usuario"){
+        if($params->perfil == "cliente"){
             $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
         }elseif($params->perfil == "profissional"){
             $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
@@ -232,6 +263,25 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
             ->withHeader('Content-type', 'application/json');
         } 
         return $response->withStatus(401, 'Usuario ou senha incorretos');
+        
+    });
+
+    $app->post('/api/validaSemSenha', function (Request $request, Response $response) use ($app,$entityManager) {
+    
+        $params = (object) $request->getParams();
+        $usersRepository = null;
+        if($params->perfil == "cliente"){
+            $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+        }elseif($params->perfil == "profissional"){
+            $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+        }
+        $userBanco = $usersRepository->findOneBy(['email' => $params->email,'cpf' => $params->cpf,'telefone1' => $params->telefone1]);
+      
+        if($userBanco != null){
+           return $response->withJson($userBanco, 200)
+            ->withHeader('Content-type', 'application/json');
+        } 
+        return $response->withStatus(404, 'Usuario não encontrado');
         
     });
 
@@ -282,7 +332,7 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
             return $return;
         });
     
-    $app->get('/api/atividade', function (Request $request, Response $response) use ($app,$entityManager) {
+    $app->get('/api/consulta/atividade', function (Request $request, Response $response) use ($app,$entityManager) {
         
             $atividadeRepository = $entityManager->getRepository('App\Models\Entity\AtividadeProfissional');
             $atividade = $atividadeRepository->findAll();
