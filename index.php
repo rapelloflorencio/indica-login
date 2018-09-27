@@ -275,7 +275,7 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
         }elseif($params->perfil == "profissional"){
             $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
         }
-        $userBanco = $usersRepository->findOneBy(['email' => $params->email,'cpf' => $params->cpf,'telefone1' => $params->telefone1]);
+        $userBanco = $usersRepository->findOneBy(array('email' => $params->email,'cpf' => $params->cpf,'telefone1' => $params->telefone1));
       
         if($userBanco != null){
            return $response->withJson($userBanco, 200)
