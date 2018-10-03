@@ -56,14 +56,14 @@ class Usuario implements \JsonSerializable
      /**
      * @var string
      *
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\Column(type="string",  unique=true, nullable=false)
      */
     private $email;
 
      /**
      * @var string
      *
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\Column(type="string",  unique=true, nullable=false)
      */
     private $telefone1;
 

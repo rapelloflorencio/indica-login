@@ -137,7 +137,7 @@ $app->post('/api/cadastro/profissional', function (Request $request, Response $r
     if($id != ''){
         $extra = $atividadeRepository->find($id);
     }
-    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$params->bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->rg,$params->imagem,$atividade_principal,$extra,$params->situacao_cadastral, $perfil);
+    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$params->bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->frenterg,$params->versorg,$params->comprovante,$params->foto,$atividade_principal,$extra,$params->situacao_cadastral, $perfil);
     
     /**
      * Persiste a entidade no banco de dados

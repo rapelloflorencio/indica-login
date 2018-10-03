@@ -70,14 +70,14 @@ class Profissional implements \JsonSerializable
      /**
      * @var string
      *
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\Column(type="string",  unique=true, nullable=false)
      */
     private $email;
 
      /**
      * @var string
      *
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\Column(type="string",  unique=true, nullable=false)
      */
     private $telefone1;
 
@@ -119,10 +119,23 @@ class Profissional implements \JsonSerializable
      /**
      * @var string
      *
-     * @ORM\Column(type="string", unique=true, nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
-    private $rg;
+    private $frenterg;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $versorg;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $comprovante;
      /**
      * @var string
      *
@@ -166,7 +179,7 @@ class Profissional implements \JsonSerializable
      */
      private $perfil;
    
-    public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, string $bairro, string $email, string $telefone1, string $telefone2,string $telefone3, string $telefone4, string $cpf, string $cnpj, string $rg, string $imagem, ?AtividadeProfissional $atividade_principal, ?AtividadeProfissional $atividade_extra, string $situacao_cadastral, ?Perfil $perfil)
+    public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, string $bairro, string $email, string $telefone1, string $telefone2,string $telefone3, string $telefone4, string $cpf, string $cnpj, string $frenterg, string $versorg, string $comprovante, string $imagem, ?AtividadeProfissional $atividade_principal, ?AtividadeProfissional $atividade_extra, string $situacao_cadastral, ?Perfil $perfil)
     {
         $this->nome = $nome;
         $this->nome_fantasia = $nome_fantasia;
@@ -183,7 +196,9 @@ class Profissional implements \JsonSerializable
         $this->telefone4 = $telefone4;
         $this->cpf = $cpf;
         $this->cnpj = $cnpj;
-        $this->rg = $rg;
+        $this->frenterg = $frenterg;
+        $this->versorg = $versorg;
+        $this->comprovante = $comprovante;
         $this->atividade_principal = $atividade_principal;
         $this->atividade_extra = $atividade_extra;
         $this->situacao_cadastral = $situacao_cadastral;
@@ -268,9 +283,19 @@ class Profissional implements \JsonSerializable
         return $this->cnpj;
     }
 
-    public function getRg(): string
+    public function getFrenterg(): string
     {
-        return $this->rg;
+        return $this->frenterg;
+    }
+
+    public function getVersorg(): string
+    {
+        return $this->versorg;
+    }
+
+    public function getComprovante(): string
+    {
+        return $this->comprovante;
     }
 
     public function getAtividade_principal(): ?AtividadeProfissional
@@ -375,8 +400,18 @@ class Profissional implements \JsonSerializable
         return $this;  
     }
 
-    public function setRg($rg){
-        $this->rg = $rg;
+    public function setFrenterg($frenterg){
+        $this->frenterg = $frenterg;
+        return $this;  
+    }
+
+    public function setVersorg($versorg){
+        $this->versorg = $versorg;
+        return $this;  
+    }
+
+    public function setComprovante($comprovante){
+        $this->comprovante = $comprovante;
         return $this;  
     }
 
@@ -421,10 +456,13 @@ class Profissional implements \JsonSerializable
             'telefone4' =>   $this->getTelefone4(),
             'cpf' =>   $this->getCpf(),
             'cnpj' =>   $this->getCnpj(),
-            'rg' => $this->getRg(),
             'atividade_principal' => $this->getAtividade_principal(),
             'atividade_extra' => $this->getAtividade_Extra(),
             'situacao_cadastral' => $this->getSituacao_cadastral(),
+            'foto' => $this->getImagem(),
+            'frenterg' => $this->getFrenterg(),
+            'versorg' => $this->getVersorg(),
+            'comprovante' => $this->getComprovante(),
             'perfil' => $this->getPerfil()
         ];
     }
