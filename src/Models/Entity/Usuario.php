@@ -6,6 +6,7 @@ namespace App\Models\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Models\Entity\Perfil;
+use App\Models\Entity\Bairro;
 
 /**
  * The User class demonstrates how to annotate a simple
@@ -47,9 +48,7 @@ class Usuario implements \JsonSerializable
     private $endereco;
 
      /**
-     * @var string
-     *
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\Bairro")
      */
     private $bairro;
 
@@ -107,7 +106,7 @@ class Usuario implements \JsonSerializable
      */
      private $perfil;
    
-    public function __construct(string $nome, string $password, string $cep, string $endereco, string $bairro, string $email, string $telefone1, string $telefone2, string $cpf, string $imagem, ?Perfil $perfil)
+    public function __construct(string $nome, string $password, string $cep, string $endereco, ?Bairro $bairro, string $email, string $telefone1, string $telefone2, string $cpf, string $imagem, ?Perfil $perfil)
     {
         $this->nome = $nome;
         $this->password = password_hash($password, PASSWORD_BCRYPT);
@@ -153,7 +152,7 @@ class Usuario implements \JsonSerializable
         return $this->endereco;
     }
 
-    public function getBairro(): string
+    public function getBairro(): ?Bairro
     {
         return $this->bairro;
     }

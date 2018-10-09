@@ -7,6 +7,7 @@ use App\Models\Entity\Usuario;
 use App\Models\Entity\Perfil;
 use App\Models\Entity\Profissional;
 use App\Models\Entity\AtividadeProfissional;
+use App\Models\Entity\Bairro;
 use Slim\App;
 use Slim\Container;
 use Doctrine\ORM\EntityManager;
@@ -107,7 +108,11 @@ $app->post('/api/cadastro/usuario', function (Request $request, Response $respon
     $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
     $perfil = $perfilRepository->find($id);        
 
-    $user = new Usuario($params->nome,$params->password,$params->cep,$params->endereco,$params->bairro,$params->email,$params->telefone1,$params->telefone2,$params->cpf,$params->imagem, $perfil);
+    $id = $params->bairro;
+    $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
+    $bairro = $bairroRepository->find($id);        
+
+    $user = new Usuario($params->nome,$params->password,$params->cep,$params->endereco,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->cpf,$params->imagem, $perfil);
     
     /**
      * Persiste a entidade no banco de dados
@@ -137,7 +142,10 @@ $app->post('/api/cadastro/profissional', function (Request $request, Response $r
     if($id != ''){
         $extra = $atividadeRepository->find($id);
     }
-    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$params->bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->frenterg,$params->versorg,$params->comprovante,$params->foto,$atividade_principal,$extra,$params->situacao_cadastral, $perfil);
+    $id = $params->bairro;
+    $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
+    $bairro = $bairroRepository->find($id); 
+    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->frenterg,$params->versorg,$params->comprovante,$params->foto,$atividade_principal,$extra,$params->situacao_cadastral, $perfil);
     
     /**
      * Persiste a entidade no banco de dados
@@ -349,6 +357,27 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
             $atividade = $atividadeRepository->find($id);        
         
             $return = $response->withJson($atividade, 200)
+                ->withHeader('Content-type', 'application/json');
+            return $return;
+        });
+    
+        $app->get('/api/consulta/bairro', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+            $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
+            $bairros = $bairroRepository->findAll();
+        
+            $return = $response->withJson($bairros, 200)
+                ->withHeader('Content-type', 'application/json');
+            return $return;
+        });
+
+    $app->get('/api/bairro/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+            $route = $request->getAttribute('route');
+            $id = $route->getArgument('id');
+            $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
+            $bairro = $bairroRepository->find($id);        
+        
+            $return = $response->withJson($bairro, 200)
                 ->withHeader('Content-type', 'application/json');
             return $return;
         });

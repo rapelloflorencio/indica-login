@@ -7,6 +7,7 @@ namespace App\Models\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Models\Entity\Perfil;
 use App\Models\Entity\AtividadeProfissional;
+use App\Models\Entity\Bairro;
 
 /**
  * The User class demonstrates how to annotate a simple
@@ -61,9 +62,7 @@ class Profissional implements \JsonSerializable
     private $complemento;
 
      /**
-     * @var string
-     *
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\Bairro")
      */
     private $bairro;
 
@@ -179,7 +178,7 @@ class Profissional implements \JsonSerializable
      */
      private $perfil;
    
-    public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, string $bairro, string $email, string $telefone1, string $telefone2,string $telefone3, string $telefone4, string $cpf, string $cnpj, string $frenterg, string $versorg, string $comprovante, string $imagem, ?AtividadeProfissional $atividade_principal, ?AtividadeProfissional $atividade_extra, string $situacao_cadastral, ?Perfil $perfil)
+    public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, ?Bairro $bairro, string $email, string $telefone1, string $telefone2,string $telefone3, string $telefone4, string $cpf, string $cnpj, string $frenterg, string $versorg, string $comprovante, string $imagem, ?AtividadeProfissional $atividade_principal, ?AtividadeProfissional $atividade_extra, string $situacao_cadastral, ?Perfil $perfil)
     {
         $this->nome = $nome;
         $this->nome_fantasia = $nome_fantasia;
@@ -243,7 +242,7 @@ class Profissional implements \JsonSerializable
     {
         return $this->complemento;
     }
-    public function getBairro(): string
+    public function getBairro(): ?Bairro
     {
         return $this->bairro;
     }
