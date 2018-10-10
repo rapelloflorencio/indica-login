@@ -262,6 +262,7 @@ class Usuario implements \JsonSerializable
             'telefone1' =>    $this->getTelefone1(),
             'telefone2' =>   $this->getTelefone2(),
             'cpf' =>   $this->getCpf(),
+            'foto' => $this->getImagem(),
             'perfil' => $this->getPerfil()
         ];
     }

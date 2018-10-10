@@ -16,6 +16,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Bairro implements \JsonSerializable
 {
     /**
+     * @var int
+     *
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
@@ -28,6 +30,8 @@ class Bairro implements \JsonSerializable
     private $uf;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
      */
     private $codigo_ibge;
@@ -69,7 +73,7 @@ class Bairro implements \JsonSerializable
         return $this;  
     }
 
-    public function getCodigo_Ibge(): integer
+    public function getCodigo_Ibge(): int
     {
         return $this->codigo_ibge;
     }
