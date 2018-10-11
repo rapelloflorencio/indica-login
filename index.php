@@ -112,7 +112,7 @@ $app->post('/api/cadastro/usuario', function (Request $request, Response $respon
     $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
     $bairro = $bairroRepository->find($id);        
 
-    $user = new Usuario($params->nome,$params->password,$params->cep,$params->endereco,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->cpf,$params->imagem, $perfil);
+    $user = new Usuario($params->nome,$params->password,$params->cep,$params->endereco,$params->bairro,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->cpf,$params->imagem, $perfil);
     
     /**
      * Persiste a entidade no banco de dados
@@ -179,8 +179,18 @@ $app->put('/api/usuario/{id}', function (Request $request, Response $response) u
     /**
      * Atualiza e Persiste o Usuario com os parâmetros recebidos no request
      */
-    $user->setUsuario($request->getParam('usuario'))
-        ->setPassword($request->getParam('password'));
+    $user->setNome($request->getParam('nome'))
+        ->setPassword($request->getParam('password'))
+        ->setCep($request->getParam('cep'))
+        ->setEndereco($request->getParam('endereco'))
+        ->setComplemento($request->getParam('complemento'))
+        ->setBairro($request->getParam('bairro'))
+        ->setEmail($request->getParam('email'))
+        ->setTelefone1($request->getParam('telefone1'))
+        ->setTelefone2($request->getParam('telefone2'))
+        ->setCpf($request->getParam('cpf'))
+        ->setImagem($request->getParam('imagem'))
+        ->setPerfil($request->getParam('perfil'));
 
     /**
      * Persiste a entidade no banco de dados
@@ -194,7 +204,7 @@ $app->put('/api/usuario/{id}', function (Request $request, Response $response) u
     return $return;
 });
 
-$app->put('/api/alterarSenha/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+$app->put('/api/profissional/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
 
     /**
      * Pega o ID do Usuario informado na URL
@@ -205,7 +215,62 @@ $app->put('/api/alterarSenha/{id}', function (Request $request, Response $respon
     /**
      * Encontra o Usuario no Banco
      */ 
-    $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+    $user = $usersRepository->find($id);   
+
+    
+    $user->setNome($request->getParam('nome'))
+        ->setNome_Fantasia($request->getParam('fantasia'))
+        ->setPassword($request->getParam('password'))
+        ->setCep($request->getParam('cep'))
+        ->setEndereco($request->getParam('endereco'))
+        ->setComplemento($request->getParam('complemento'))
+        ->setBairro($request->getParam('bairro'))
+        ->setEmail($request->getParam('email'))
+        ->setTelefone1($request->getParam('telefone1'))
+        ->setTelefone2($request->getParam('telefone2'))
+        ->setTelefone3($request->getParam('telefone3'))
+        ->setTelefone4($request->getParam('telefone4'))
+        ->setCpf($request->getParam('cpf'))
+        ->setCnpj($request->getParam('cnpj'))
+        ->setImagem($request->getParam('foto'))
+        ->setFrenterg($request->getParam('frenterg'))
+        ->setVersorg($request->getParam('versorg'))
+        ->setComprovante($request->getParam('comprovante'))
+        ->setAtividade_Principal($request->getParam('atividade_principal'))
+        ->setAtividade_Extra($request->getParam('extra'))
+        ->setSituacao_Cadastral($request->getParam('situacao_cadastral'))
+        ->setPerfil($request->getParam('perfil'));
+
+    /**
+     * Persiste a entidade no banco de dados
+     */
+    $entityManager->persist($user);
+    $entityManager->flush();        
+
+    
+    $return = $response->withJson($user, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+
+$app->put('/api/alterarSenha/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    /**
+     * Pega o ID do Usuario informado na URL
+     */
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('id');
+    $usersRepository = null;
+    if($request->getParam('perfil') == "cliente"){
+        $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+    }elseif($request->getParam('perfil') == "profissional"){
+        $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+    }
+    /**
+     * Encontra o Usuario no Banco
+     */ 
     $user = $usersRepository->find($id);   
 
     /**

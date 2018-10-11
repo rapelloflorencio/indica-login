@@ -215,7 +215,7 @@ class Profissional implements \JsonSerializable
         return $this->nome;
     }
 
-    public function getNome_fantasia(): string
+    public function getNome_Fantasia(): string
     {
         return $this->nome_fantasia;
     }
@@ -297,7 +297,7 @@ class Profissional implements \JsonSerializable
         return $this->comprovante;
     }
 
-    public function getAtividade_principal(): ?AtividadeProfissional
+    public function getAtividade_Principal(): ?AtividadeProfissional
     {
         return $this->atividade_principal;
     }
@@ -307,7 +307,7 @@ class Profissional implements \JsonSerializable
         return $this->atividade_extra;
     }
 
-    public function getSituacao_cadastral(): string
+    public function getSituacao_Cadastral(): string
     {
         return $this->situacao_cadastral;
     }
@@ -322,7 +322,7 @@ class Profissional implements \JsonSerializable
         return $this;  
     }
 
-    public function setNome_fantasia($nome_fantasia){
+    public function setNome_Fantasia($nome_fantasia){
         $this->nome_fantasia = $nome_fantasia;
         return $this;  
     }
@@ -414,17 +414,17 @@ class Profissional implements \JsonSerializable
         return $this;  
     }
 
-    public function setAtividade_principal($atividade_principal){
+    public function setAtividade_Principal($atividade_principal){
         $this->atividade_principal = $atividade_principal;
         return $this;  
     }
 
-    public function setAtividade_extra($atividade_extra){
+    public function setAtividade_Extra($atividade_extra){
         $this->atividade_extra = $atividade_extra;
         return $this;  
     }
 
-    public function setSituacao_cadastral($situacao_cadastral){
+    public function setSituacao_Cadastral($situacao_cadastral){
         $this->situacao_cadastral = $situacao_cadastral;
         return $this;  
     }
@@ -441,7 +441,7 @@ class Profissional implements \JsonSerializable
         return [
             'id' => $this->getId(),
             'nome' => $this->getNome(),
-            'nome_fantasia' => $this->getNome_fantasia(),
+            'nome_fantasia' => $this->getNome_Fantasia(),
             'registered_at' => $this->getRegisteredAt()
                 ->format(\DateTime::ATOM),
             'cep' => $this->getCep(),
@@ -455,13 +455,9 @@ class Profissional implements \JsonSerializable
             'telefone4' =>   $this->getTelefone4(),
             'cpf' =>   $this->getCpf(),
             'cnpj' =>   $this->getCnpj(),
-            'atividade_principal' => $this->getAtividade_principal(),
+            'atividade_principal' => $this->getAtividade_Principal(),
             'atividade_extra' => $this->getAtividade_Extra(),
-            'situacao_cadastral' => $this->getSituacao_cadastral(),
-            'foto' => $this->getImagem(),
-            'frenterg' => $this->getFrenterg(),
-            'versorg' => $this->getVersorg(),
-            'comprovante' => $this->getComprovante(),
+            'situacao_cadastral' => $this->getSituacao_Cadastral(),
             'perfil' => $this->getPerfil()
         ];
     }

@@ -47,6 +47,13 @@ class Usuario implements \JsonSerializable
      */
     private $endereco;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string")
+     */
+    private $complemento;
+
      /**
      * @ORM\ManyToOne(targetEntity="App\Models\Entity\Bairro")
      */
@@ -106,13 +113,14 @@ class Usuario implements \JsonSerializable
      */
      private $perfil;
    
-    public function __construct(string $nome, string $password, string $cep, string $endereco, ?Bairro $bairro, string $email, string $telefone1, string $telefone2, string $cpf, string $imagem, ?Perfil $perfil)
+    public function __construct(string $nome, string $password, string $cep, string $endereco,string $complemento, ?Bairro $bairro, string $email, string $telefone1, string $telefone2, string $cpf, string $imagem, ?Perfil $perfil)
     {
         $this->nome = $nome;
         $this->password = password_hash($password, PASSWORD_BCRYPT);
         $this->registeredAt = new \DateTimeImmutable('now');
         $this->cep = $cep;
         $this->endereco = $endereco;
+        $this->complemento = $complemento;
         $this->bairro = $bairro;
         $this->email = $email;
         $this->telefone1 = $telefone1;
@@ -150,6 +158,11 @@ class Usuario implements \JsonSerializable
     public function getEndereco(): string
     {
         return $this->endereco;
+    }
+
+    public function getComplemento(): string
+    {
+        return $this->complemento;
     }
 
     public function getBairro(): ?Bairro
@@ -194,6 +207,11 @@ class Usuario implements \JsonSerializable
 
     public function setEndereco($endereco){
         $this->endereco = $endereco;
+        return $this;  
+    }
+
+    public function setComplemento($complemento){
+        $this->complemento = $complemento;
         return $this;  
     }
 
@@ -257,12 +275,12 @@ class Usuario implements \JsonSerializable
                 ->format(\DateTime::ATOM),
             'cep' => $this->getCep(),
             'endereco' =>   $this->getEndereco(),
+            'complemento' => $this->getComplemento(),
             'bairro' =>   $this->getBairro(),
             'email' =>   $this->getEmail(),
             'telefone1' =>    $this->getTelefone1(),
             'telefone2' =>   $this->getTelefone2(),
             'cpf' =>   $this->getCpf(),
-            'foto' => $this->getImagem(),
             'perfil' => $this->getPerfil()
         ];
     }
