@@ -176,6 +176,11 @@ $app->put('/api/usuario/{id}', function (Request $request, Response $response) u
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
     $user = $usersRepository->find($id);   
 
+    $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
+    $bairro = $bairroRepository->find($request->getParam('bairro')); 
+
+    $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
+    $perfil = $perfilRepository->find($request->getParam('perfil'));
     /**
      * Atualiza e Persiste o Usuario com os parâmetros recebidos no request
      */
@@ -184,13 +189,13 @@ $app->put('/api/usuario/{id}', function (Request $request, Response $response) u
         ->setCep($request->getParam('cep'))
         ->setEndereco($request->getParam('endereco'))
         ->setComplemento($request->getParam('complemento'))
-        ->setBairro($request->getParam('bairro'))
+        ->setBairro($bairro)
         ->setEmail($request->getParam('email'))
         ->setTelefone1($request->getParam('telefone1'))
         ->setTelefone2($request->getParam('telefone2'))
         ->setCpf($request->getParam('cpf'))
         ->setImagem($request->getParam('imagem'))
-        ->setPerfil($request->getParam('perfil'));
+        ->setPerfil($perfil);
 
     /**
      * Persiste a entidade no banco de dados
@@ -218,14 +223,23 @@ $app->put('/api/profissional/{id}', function (Request $request, Response $respon
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
     $user = $usersRepository->find($id);   
 
+    $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
+    $bairro = $bairroRepository->find($request->getParam('bairro')); 
+
+    $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
+    $perfil = $perfilRepository->find($request->getParam('perfil'));
     
+    $atividadeRepository = $entityManager->getRepository('App\Models\Entity\AtividadeProfissional');
+    $atividade_principal = $atividadeRepository->find($request->getParam('atividade_principal'));
+    $extra = $atividadeRepository->find($request->getParam('extra'));
+
     $user->setNome($request->getParam('nome'))
         ->setNome_Fantasia($request->getParam('fantasia'))
         ->setPassword($request->getParam('password'))
         ->setCep($request->getParam('cep'))
         ->setEndereco($request->getParam('endereco'))
         ->setComplemento($request->getParam('complemento'))
-        ->setBairro($request->getParam('bairro'))
+        ->setBairro($bairro)
         ->setEmail($request->getParam('email'))
         ->setTelefone1($request->getParam('telefone1'))
         ->setTelefone2($request->getParam('telefone2'))
@@ -237,10 +251,10 @@ $app->put('/api/profissional/{id}', function (Request $request, Response $respon
         ->setFrenterg($request->getParam('frenterg'))
         ->setVersorg($request->getParam('versorg'))
         ->setComprovante($request->getParam('comprovante'))
-        ->setAtividade_Principal($request->getParam('atividade_principal'))
-        ->setAtividade_Extra($request->getParam('extra'))
+        ->setAtividade_Principal($atividade_principal)
+        ->setAtividade_Extra($extra)
         ->setSituacao_Cadastral($request->getParam('situacao_cadastral'))
-        ->setPerfil($request->getParam('perfil'));
+        ->setPerfil($perfil);
 
     /**
      * Persiste a entidade no banco de dados
