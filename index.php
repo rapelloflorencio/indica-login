@@ -85,6 +85,33 @@ $app->get('/api/usuario/{id}', function (Request $request, Response $response) u
     return $return;
 });
 
+$app->post('/api/imagens/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('id');
+    $usersRepository = null;
+    $retorno = null;
+    if($request->getParam('perfil') == "cliente"){
+        $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+        $user = $usersRepository->find($id);
+        $retorno = [
+            'foto' => $user->getImagem()
+        ];
+    }elseif($request->getParam('perfil') == "profissional"){
+        $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+        $user = $usersRepository->find($id);
+        $retorno = [
+            'foto' => $user->getImagem(),
+            'frenterg' => $user->getFrenterg(),
+            'versorg' => $user->getVersorg(),
+            'comprovante' => $user->getComprovante()
+        ];
+    }
+   
+    $return = $response->withJson($retorno, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
 $app->get('/api/profissional/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
     $route = $request->getAttribute('route');
     $id = $route->getArgument('id');
