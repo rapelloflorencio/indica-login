@@ -108,7 +108,8 @@ $app->post('/api/imagens/{id}', function (Request $request, Response $response) 
     }
    
     $return = $response->withJson($retorno, 200)
-        ->withHeader('Content-type', 'application/json');
+        ->withHeader('Content-type', 'application/json')
+        ->withHeader('Access-Control-Allow-Origin', '*');
     return $return;
 });
 
@@ -139,7 +140,7 @@ $app->post('/api/cadastro/usuario', function (Request $request, Response $respon
     $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
     $bairro = $bairroRepository->find($id);        
 
-    $user = new Usuario($params->nome,$params->password,$params->cep,$params->endereco,$params->bairro,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->cpf,$params->imagem, $perfil);
+    $user = new Usuario($params->nome,$params->password,$params->cep,$params->endereco,$params->complemento,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->cpf,$params->imagem, $perfil);
     
     /**
      * Persiste a entidade no banco de dados

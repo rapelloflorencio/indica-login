@@ -113,7 +113,7 @@ class Usuario implements \JsonSerializable
      */
      private $perfil;
    
-    public function __construct(string $nome, string $password, string $cep, string $endereco,string $complemento, ?Bairro $bairro, string $email, string $telefone1, string $telefone2, string $cpf, string $imagem, ?Perfil $perfil)
+    public function __construct(string $nome, string $password, string $cep, string $endereco, string $complemento, ?Bairro $bairro, string $email, string $telefone1, string $telefone2, string $cpf, string $imagem, ?Perfil $perfil)
     {
         $this->nome = $nome;
         $this->password = password_hash($password, PASSWORD_BCRYPT);
