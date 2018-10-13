@@ -67,29 +67,6 @@ $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($r
 });
 
 /**
- * Lista de todos os usuarios
- * @request curl -X GET http://localhost:8000/user
- */
-$app->get('/api/usuario', function (Request $request, Response $response) use ($app,$entityManager) {
-
-    $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
-    $users = $usersRepository->findAll();
-
-    $return = $response->withJson($users, 200)
-        ->withHeader('Content-type', 'application/json');
-    return $return;
-});
-
-$app->get('/api/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
-
-    $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
-    $users = $usersRepository->findAll();
-
-    $return = $response->withJson($users, 200)
-        ->withHeader('Content-type', 'application/json');
-    return $return;
-});
-/**
  * Retornando mais informações do usuario informado pelo id
  * @request curl -X GET http://localhost:8000/user/1
  */
@@ -138,6 +115,31 @@ $app->get('/api/profissional/{id}', function (Request $request, Response $respon
     $user = $usersRepository->find($id);        
 
     $return = $response->withJson($user, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+
+/**
+ * Lista de todos os usuarios
+ * @request curl -X GET http://localhost:8000/user
+ */
+$app->get('/api/usuario', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+    $users = $usersRepository->findAll();
+
+    $return = $response->withJson($users, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+$app->get('/api/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+    $users = $usersRepository->findAll();
+
+    $return = $response->withJson($users, 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
 });
@@ -431,21 +433,21 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
             return $return;
         });
     
-        $app->get('/api/perfil', function (Request $request, Response $response) use ($app,$entityManager) {
-        
-            $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
-            $perfil = $perfilRepository->findAll();
-        
-            $return = $response->withJson($perfil, 200)
-                ->withHeader('Content-type', 'application/json');
-            return $return;
-        });
-
         $app->get('/api/perfil/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
             $route = $request->getAttribute('route');
             $id = $route->getArgument('id');
             $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
             $perfil = $perfilRepository->find($id);        
+        
+            $return = $response->withJson($perfil, 200)
+                ->withHeader('Content-type', 'application/json');
+            return $return;
+        });
+       
+        $app->get('/api/perfil', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+            $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
+            $perfil = $perfilRepository->findAll();
         
             $return = $response->withJson($perfil, 200)
                 ->withHeader('Content-type', 'application/json');
