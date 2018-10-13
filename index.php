@@ -42,7 +42,7 @@ $authenticator = function($request, TokenAuthentication $tokenAuth){
  */
 $app->add(new TokenAuthentication([
     'path' =>   '/api',
-    'passthrough' => ['/api/login','/api/cadastro','/api/consulta','/api/validaSemSenha', '/api/alterarSenha/'],
+    'passthrough' => ['/api/login','/api/cadastro','/api/consulta','/api/validaSemSenha', '/api/alterarSenha/', "/api/imagens/" ],
     'authenticator' => $authenticator,
     'secure' => false
 ]));
