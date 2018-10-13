@@ -108,8 +108,7 @@ $app->post('/api/imagens/{id}', function (Request $request, Response $response) 
     }
    
     $return = $response->withJson($retorno, 200)
-        ->withHeader('Content-type', 'application/json')
-        ->withHeader('Access-Control-Allow-Origin', '*');
+        ->withHeader('Content-type', 'application/json');
     return $return;
 });
 
