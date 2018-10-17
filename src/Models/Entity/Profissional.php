@@ -288,11 +288,17 @@ class Profissional implements \JsonSerializable
 
     public function getCpf(): string
     {
+        if($this->cpf==null){
+           return '';
+        }
         return $this->cpf;
     }
 
     public function getCnpj(): string
     {
+        if($this->cnpj==null){
+           return '';
+        }
         return $this->cnpj;
     }
 
