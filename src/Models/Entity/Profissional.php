@@ -177,8 +177,15 @@ class Profissional implements \JsonSerializable
      * @ORM\ManyToOne(targetEntity="App\Models\Entity\Perfil")
      */
      private $perfil;
-   
-    public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, ?Bairro $bairro, string $email, string $telefone1, string $telefone2,string $telefone3, string $telefone4, string $cpf, string $cnpj, string $frenterg, string $versorg, string $comprovante, string $imagem, ?AtividadeProfissional $atividade_principal, ?AtividadeProfissional $atividade_extra, string $situacao_cadastral, ?Perfil $perfil)
+    
+     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=false)
+     */
+    private $identidade;
+
+    public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, ?Bairro $bairro, string $email, string $telefone1, string $telefone2,string $telefone3, string $telefone4, string $cpf, string $cnpj, string $frenterg, string $versorg, string $comprovante, string $imagem, ?AtividadeProfissional $atividade_principal, ?AtividadeProfissional $atividade_extra, string $situacao_cadastral, ?Perfil $perfil, string $identidade)
     {
         $this->nome = $nome;
         $this->nome_fantasia = $nome_fantasia;
@@ -193,6 +200,12 @@ class Profissional implements \JsonSerializable
         $this->telefone2 = $telefone2;
         $this->telefone3 = $telefone3;
         $this->telefone4 = $telefone4;
+        if($cpf == ""){
+            $cpf = null;
+        }
+        if($cnpj == ""){
+            $cnpj = null;
+        }
         $this->cpf = $cpf;
         $this->cnpj = $cnpj;
         $this->frenterg = $frenterg;
@@ -203,6 +216,7 @@ class Profissional implements \JsonSerializable
         $this->situacao_cadastral = $situacao_cadastral;
         $this->imagem = $imagem;
         $this->perfil = $perfil;
+        $this->identidade = $identidade;
     }
 
     public function getId(): int
@@ -297,6 +311,11 @@ class Profissional implements \JsonSerializable
         return $this->comprovante;
     }
 
+    public function getIdentidade(): string
+    {
+        return $this->identidade;
+    }
+
     public function getAtividade_Principal(): ?AtividadeProfissional
     {
         return $this->atividade_principal;
@@ -319,6 +338,11 @@ class Profissional implements \JsonSerializable
 
     public function setNome($nome){
         $this->nome = $nome;
+        return $this;  
+    }
+
+    public function setIdentidade($identidade){
+        $this->identidade = $identidade;
         return $this;  
     }
 
@@ -458,7 +482,8 @@ class Profissional implements \JsonSerializable
             'atividade_principal' => $this->getAtividade_Principal(),
             'atividade_extra' => $this->getAtividade_Extra(),
             'situacao_cadastral' => $this->getSituacao_Cadastral(),
-            'perfil' => $this->getPerfil()
+            'perfil' => $this->getPerfil(),
+            'identidade' => $this->getIdentidade()
         ];
     }
 }

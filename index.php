@@ -42,7 +42,7 @@ $authenticator = function($request, TokenAuthentication $tokenAuth){
  */
 $app->add(new TokenAuthentication([
     'path' =>   '/api',
-    'passthrough' => ['/api/login','/api/cadastro','/api/consulta','/api/validaSemSenha', '/api/alterarSenha/', "/api/imagens/" ],
+    'passthrough' => ['/api/login','/api/cadastro','/api/consulta','/api/validaSemSenha', '/api/alterarSenha/', "/api/imagens/", '/api/usuario/','/api/profissional/' ],
     'authenticator' => $authenticator,
     'secure' => false
 ]));
@@ -505,6 +505,35 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
             $bairro = $bairroRepository->find($id);        
         
             $return = $response->withJson($bairro, 200)
+                ->withHeader('Content-type', 'application/json');
+            return $return;
+        });
+
+$app->post('/api/consulta/quantidade/profissional/bairro/atividade', function (Request $request, Response $response) use ($app,$entityManager) {
+    $params = (object) $request->getParams();
+    $repository = $entityManager->getRepository('App\Models\Entity\Profissional');
+            
+    $totalPorBairro =  $repository->createQueryBuilder('u')
+            ->select('count(u.id)')
+            ->where('u.bairro.id = :id_bairro')
+            ->andWhere('u.atividade_principal.id = :id_atividade')
+            ->setParameter('id_bairro', $params->id_bairro)
+            ->setParameter('id_atividade', $params->id_atividade)
+            ->getQuery()
+            ->getSingleScalarResult();
+    
+    $totalPorAtividade =  $repository->createQueryBuilder('u')
+    ->select('count(u.id)')
+    ->where('u.atividade_principal.id = :id_atividade')
+    ->setParameter('id_atividade', $params->id_atividade)
+    ->getQuery()
+    ->getSingleScalarResult();
+
+    $resultado = [
+        'totalPorBairro'=>$totalPorBairro,
+        'totalPorAtividade'=>$totalPorAtividade
+    ];
+    $return = $response->withJson($resultado,200)
                 ->withHeader('Content-type', 'application/json');
             return $return;
         });
