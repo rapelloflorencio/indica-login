@@ -512,20 +512,26 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
 $app->post('/api/consulta/quantidade/profissional/bairro/atividade', function (Request $request, Response $response) use ($app,$entityManager) {
     $params = (object) $request->getParams();
     $repository = $entityManager->getRepository('App\Models\Entity\Profissional');
-            
+    
+    $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
+    $bairro = $bairroRepository->find($params->id_bairro);
+    
+    $atividadeRepository = $entityManager->getRepository('App\Models\Entity\AtividadeProfissional');
+    $atividade = $atividadeRepository->find($params->id_atividade); 
+
     $totalPorBairro =  $repository->createQueryBuilder('u')
             ->select('count(u.id)')
-            ->where('u.bairro.id = :id_bairro')
-            ->andWhere('u.atividade_principal.id = :id_atividade')
-            ->setParameter('id_bairro', $params->id_bairro)
-            ->setParameter('id_atividade', $params->id_atividade)
+            ->andWhere('u.bairro = :bairro')
+            ->setParameter('bairro', $bairro)
+            ->andWhere('u.atividade_principal = :atividade')
+            ->setParameter('atividade', $atividade)
             ->getQuery()
             ->getSingleScalarResult();
     
     $totalPorAtividade =  $repository->createQueryBuilder('u')
     ->select('count(u.id)')
-    ->where('u.atividade_principal.id = :id_atividade')
-    ->setParameter('id_atividade', $params->id_atividade)
+    ->andWhere('u.atividade_principal = :atividade')
+    ->setParameter('atividade', $atividade)
     ->getQuery()
     ->getSingleScalarResult();
 
