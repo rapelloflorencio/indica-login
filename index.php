@@ -8,6 +8,7 @@ use App\Models\Entity\Perfil;
 use App\Models\Entity\Profissional;
 use App\Models\Entity\AtividadeProfissional;
 use App\Models\Entity\Bairro;
+use App\Models\Entity\HorarioServico;
 use Slim\App;
 use Slim\Container;
 use Doctrine\ORM\EntityManager;
@@ -543,4 +544,15 @@ $app->post('/api/consulta/quantidade/profissional/bairro/atividade', function (R
                 ->withHeader('Content-type', 'application/json');
             return $return;
         });
+
+$app->get('/api/consulta/horario', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+    $repository = $entityManager->getRepository('App\Models\Entity\HorarioServico');
+    $horarios = $repository->findAll();
+        
+    $return = $response->withJson($horarios, 200)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+});
+
 $app->run();
