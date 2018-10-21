@@ -9,6 +9,9 @@ use App\Models\Entity\Profissional;
 use App\Models\Entity\AtividadeProfissional;
 use App\Models\Entity\Bairro;
 use App\Models\Entity\HorarioServico;
+use App\Models\Entity\Orcamento;
+use App\Models\Entity\SolicitacaoOrcamento;
+use App\Models\Entity\StatusOrcamento;
 use Slim\App;
 use Slim\Container;
 use Doctrine\ORM\EntityManager;
@@ -553,6 +556,32 @@ $app->get('/api/consulta/horario', function (Request $request, Response $respons
     $return = $response->withJson($horarios, 200)
         ->withHeader('Content-type', 'application/json');
             return $return;
+});
+
+$app->post('/api/solicitar/orcamento', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+    $params = (object) $request->getParams();
+    
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+    $usuario = $usersRepository->find($params->idUsuario);   
+
+    $atividadeRepository = $entityManager->getRepository('App\Models\Entity\AtividadeProfissional');
+    $atividade = $atividadeRepository->find($params->idAtividade); 
+
+    $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
+    $bairro = $bairroRepository->find($params->idBairro); 
+
+    $horarioRepository = $entityManager->getRepository('App\Models\Entity\HorarioServico');
+    $horario = $horarioRepository->find($params->idHorario); 
+
+    $solicitacao = new SolicitacaoOrcamento($usuario, $atividade, $bairro, $params->textoSolicitacao, $params->dataDesejada, $horario);
+    
+    $entityManager->persist($solicitacao);
+    $entityManager->flush();
+       
+    $return = $response->withJson($solicitacao, 201)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
 });
 
 $app->run();
