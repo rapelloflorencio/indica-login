@@ -397,7 +397,7 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
         $userBanco = $usersRepository->findOneBy(array('email' => $params->email));
       
         if(password_verify($params->password, $userBanco->getPassword())){
-            $token = ['usuario'=> $userBanco , 'token' => '$2y$10$AJi4JsNTXkoJar.RvC0r9eEXnvPtUKA74h1UqPAujPac8RChKmvb6' ];
+            $token = ['usuario'=> $userBanco , 'token' => 'Bearer $2y$10$AJi4JsNTXkoJar.RvC0r9eEXnvPtUKA74h1UqPAujPac8RChKmvb6' ];
             return $response->withJson($token, 200)
             ->withHeader('Content-type', 'application/json');
         } 
