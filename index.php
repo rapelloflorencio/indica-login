@@ -1,5 +1,5 @@
 <?php
-date_default_timezone_set("America/Los_Angeles");
+date_default_timezone_set("America/Sao_Paulo");
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
@@ -13,6 +13,8 @@ use App\Models\Entity\HorarioServico;
 use App\Models\Entity\Orcamento;
 use App\Models\Entity\SolicitacaoOrcamento;
 use App\Models\Entity\StatusOrcamento;
+use App\Models\Entity\LocalAtendimento;
+use App\Models\Entity\UrgenciaServico;
 use Slim\App;
 use Slim\Container;
 use Doctrine\ORM\EntityManager;
@@ -573,9 +575,15 @@ $app->post('/api/solicitar/orcamento', function (Request $request, Response $res
     $bairro = $bairroRepository->find($params->idBairro); 
 
     $horarioRepository = $entityManager->getRepository('App\Models\Entity\HorarioServico');
-    $horario = $horarioRepository->find($params->idHorario); 
+    $horario = $horarioRepository->find($params->idHorario);
+    
+    $localAtendimentoRepository = $entityManager->getRepository('App\Models\Entity\LocalAtendimento');
+    $localAtendimento = $localAtendimentoRepository->find($params->idLocalAtendimento);
 
-    $solicitacao = new SolicitacaoOrcamento($usuario, $atividade, $bairro, $params->textoSolicitacao, $params->dataDesejada, $horario);
+    $urgenciaServicoRepository = $entityManager->getRepository('App\Models\Entity\UrgenciaServico');
+    $urgenciaServico = $urgenciaServicoRepository->find($params->idUrgencia);
+
+    $solicitacao = new SolicitacaoOrcamento($usuario, $atividade, $bairro, $params->textoSolicitacao, $urgenciaServico, $localAtendimento, $horario);
     
     $entityManager->persist($solicitacao);
     $entityManager->flush();

@@ -11,6 +11,8 @@ use App\Models\Entity\SolicitacaoOrcamento;
 use App\Models\Entity\Usuario;
 use App\Models\Entity\HorarioServico;
 use App\Models\Entity\Orcamento;
+use App\Models\Entity\LocalAtendimento;
+use App\Models\Entity\UrgenciaServico;
 
 /**
  * The User class demonstrates how to annotate a simple
@@ -51,11 +53,14 @@ class SolicitacaoOrcamento implements \JsonSerializable
     private $textoSolicitacao;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="string", nullable=false, name="data_desejada")
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\UrgenciaServico")
      */
-    private $dataDesejada;
+    private $urgenciaServico;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\LocalAtendimento")
+     */
+    private $localAtendimento;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Models\Entity\HorarioServico")
@@ -81,13 +86,14 @@ class SolicitacaoOrcamento implements \JsonSerializable
     private $orcamento2;
 
 
-    public function __construct(?Usuario $usuario, ?AtividadeProfissional $atividade, ?Bairro $bairro, string $textoSolicitacao, string $dataDesejada,?HorarioServico $horario)
+    public function __construct(?Usuario $usuario, ?AtividadeProfissional $atividade, ?Bairro $bairro, string $textoSolicitacao, ?UrgenciaServico $urgenciaServico,?LocalAtendimento $localAtendimento,?HorarioServico $horario)
     {
         $this->usuario = $usuario;
         $this->atividade = $atividade;
         $this->bairro = $bairro;
         $this->textoSolicitacao = $textoSolicitacao;
-        $this->dataDesejada = $dataDesejada;
+        $this->urgenciaServico = $urgenciaServico;
+        $this->localAtendimento = $localAtendimento;
         $this->horario = $horario;
         $this->dataSolicitacao = new \DateTimeImmutable('now');
     }
@@ -137,13 +143,23 @@ class SolicitacaoOrcamento implements \JsonSerializable
         return $this;  
     }
 
-    public function getDataDesejada(): string
+    public function getUrgenciaServico(): ?UrgenciaServico
     {
-        return $this->dataDesejada;
+        return $this->urgenciaServico;
     }
 
-    public function setDataDesejada($dataDesejada){
-        $this->dataDesejada = $dataDesejada;
+    public function setUrgenciaServico($urgenciaServico){
+        $this->urgenciaServico = $urgenciaServico;
+        return $this;  
+    }
+
+    public function getLocalAtendimento(): ?LocalAtendimento
+    {
+        return $this->localAtendimento;
+    }
+
+    public function setLocalAtendimento($localAtendimento){
+        $this->localAtendimento = $localAtendimento;
         return $this;  
     }
 
@@ -193,7 +209,8 @@ class SolicitacaoOrcamento implements \JsonSerializable
             'atividade' => $this->getAtividade(),
             'bairro' => $this->getBairro(),
             'textoSolicitacao' => $this->getTextoSolicitacao(),
-            'dataDesejada' => $this->getDataDesejada(),
+            'urgenciaServico' => $this->getUrgenciaServico(),
+            'localAtendimento' => $this->getLocalAtendimento(),
             'horario' => $this->getHorario(),
             'dataSolicitacao' => $this->getDataSolicitacao(),
             'orcamento1' => $this->getOrcamento1(),
