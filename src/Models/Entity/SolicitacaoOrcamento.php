@@ -85,6 +85,12 @@ class SolicitacaoOrcamento implements \JsonSerializable
      */
     private $orcamento2;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=false, name="status")
+     */
+    private $status;
 
     public function __construct(?Usuario $usuario, ?AtividadeProfissional $atividade, ?Bairro $bairro, string $textoSolicitacao, ?UrgenciaServico $urgenciaServico,?LocalAtendimento $localAtendimento,?HorarioServico $horario)
     {
@@ -96,6 +102,7 @@ class SolicitacaoOrcamento implements \JsonSerializable
         $this->localAtendimento = $localAtendimento;
         $this->horario = $horario;
         $this->dataSolicitacao = new \DateTimeImmutable('now');
+        $this->status = "A";
     }
 
     public function getId(): int
@@ -198,6 +205,16 @@ class SolicitacaoOrcamento implements \JsonSerializable
         return $this;  
     }
 
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus($status){
+        $this->status = $status;
+        return $this;  
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -214,7 +231,8 @@ class SolicitacaoOrcamento implements \JsonSerializable
             'horario' => $this->getHorario(),
             'dataSolicitacao' => $this->getDataSolicitacao(),
             'orcamento1' => $this->getOrcamento1(),
-            'orcamento2' => $this->getOrcamento2()
+            'orcamento2' => $this->getOrcamento2(),
+            'status' => $this->getStatus()
         ];
     }
 }

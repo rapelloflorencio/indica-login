@@ -573,6 +573,19 @@ $app->post('/api/solicitar/orcamento', function (Request $request, Response $res
     $urgenciaServicoRepository = $entityManager->getRepository('App\Models\Entity\UrgenciaServico');
     $urgenciaServico = $urgenciaServicoRepository->find($params->idUrgencia);
 
+    $solicitacaoRepository = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento');
+    $solicitacaoAberta = $solicitacaoRepository->createQueryBuilder('u')
+    ->select('count(u.id)')
+    ->andWhere('u.usuario = :usuario')
+    ->setParameter('usuario', $usuario)
+    ->andWhere('u.atividade = :atividade')
+    ->setParameter('atividade', $atividade)
+    ->andWhere('u.status = :status')
+    ->setParameter('status', "A")
+    ->getQuery()
+    ->getSingleScalarResult();
+
+    if($solicitacaoAberta==0){
     $solicitacao = new SolicitacaoOrcamento($usuario, $atividade, $bairro, $params->textoSolicitacao, $urgenciaServico, $localAtendimento, $horario);
     
     $entityManager->persist($solicitacao);
@@ -581,6 +594,55 @@ $app->post('/api/solicitar/orcamento', function (Request $request, Response $res
     $return = $response->withJson($solicitacao, 201)
         ->withHeader('Content-type', 'application/json');
     return $return;
+    }else{
+        $return = $response->withJson(['mensagem'=>"Já existe solicitação em aberto"], 409)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+    }
 });
+
+$app->get('/api/consulta/solicitacao/{tipoUsuario}/{idUsuario}/{status}', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+    $route = $request->getAttribute('route');
+    $idUsuario = $route->getArgument('idUsuario');
+    $tipoUsuario = $route->getArgument('tipoUsuario');
+
+    $status = $route->getArgument('status');
+    $repository = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento');
+    $solicitacao = null;
+    $usersRepository = null;
+    if($tipoUsuario == "cliente"){
+        $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+        $usuario = $usersRepository->find($idUsuario);
+        $solicitacao = $repository->findOneBy(array('usuario' => $usuario, 'status' => $status));
+    }elseif($tipoUsuario == "profissional"){
+        $profissionalRepository = $entityManager->getRepository('App\Models\Entity\Profissional'); 
+        $profissional = $profissionalRepository->find($idUsuario);
+        $solicitacao = $repository->findOneBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => $status));
+    }
+    
+    $return = $response->withJson($solicitacao, 200)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+});
+
+$app->put('/api/cancelar/solicitacao/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('id');
+    
+    $repository = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento');
+    $solicitacao = $repository->find($id);
+    
+    $solicitacao->setStatus("F");
+
+    $entityManager->persist($solicitacao);
+    $entityManager->flush();        
+  
+    $return = $response->withJson($solicitacao, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
 
 $app->run();
