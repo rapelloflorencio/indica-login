@@ -64,7 +64,7 @@ class Orcamento implements \JsonSerializable
     public function __construct(?StatusOrcamento $status, ?SolicitacaoOrcamento $solicitacao, ?Profissional $profissional, int $valor, string $descricao)
     {
         $this->status = $status;
-        $this->solcitacao = $solicitacao;
+        $this->solicitacao = $solicitacao;
         $this->profissional = $profissional;
         $this->valor = $valor;
         $this->descricao = $descricao;

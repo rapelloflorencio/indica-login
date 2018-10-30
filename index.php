@@ -652,7 +652,7 @@ $app->post('/api/gravar/orcamento', function (Request $request, Response $respon
     $status = $entityManager->getRepository('App\Models\Entity\StatusOrcamento')->find($params->status);
     $solicitacao = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento')->find($params->solicitacao);
     $profissional = $entityManager->getRepository('App\Models\Entity\Profissional')->find($params->profissional);
-    $valor = $params->profissional;
+    $valor = $params->valor;
     $descricao = $params->descricao;
 
     $orcamento = new Orcamento($status, $solicitacao, $profissional, $valor, $descricao);
@@ -660,7 +660,7 @@ $app->post('/api/gravar/orcamento', function (Request $request, Response $respon
     $entityManager->persist($orcamento);
     $entityManager->flush();
         
-    $return = $response->withJson($horarios, 201)
+    $return = $response->withJson($orcamento, 201)
         ->withHeader('Content-type', 'application/json');
             return $return;
 });
