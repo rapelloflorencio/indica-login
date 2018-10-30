@@ -190,7 +190,7 @@ $app->post('/api/cadastro/profissional', function (Request $request, Response $r
     $id = $params->bairro;
     $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
     $bairro = $bairroRepository->find($id); 
-    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->frenterg,$params->versorg,$params->comprovante,$params->foto,$atividade_principal,$extra,$params->situacao_cadastral, $perfil,'');
+    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->frenterg,$params->versorg,$params->comprovante,$params->foto,$atividade_principal,$extra,$params->situacao_cadastral, $perfil,$params->identidade);
     
     /**
      * Persiste a entidade no banco de dados
@@ -299,7 +299,8 @@ $app->put('/api/profissional/{id}', function (Request $request, Response $respon
         ->setAtividade_Principal($atividade_principal)
         ->setAtividade_Extra($extra)
         ->setSituacao_Cadastral($request->getParam('situacao_cadastral'))
-        ->setPerfil($perfil);
+        ->setPerfil($perfil)
+        ->setIdentidade($request->getParam('identidade'));
 
     /**
      * Persiste a entidade no banco de dados
@@ -642,6 +643,26 @@ $app->put('/api/cancelar/solicitacao/{id}', function (Request $request, Response
     $return = $response->withJson($solicitacao, 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
+});
+
+$app->post('/api/gravar/orcamento', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+    $params = (object) $request->getParams();
+    
+    $status = $entityManager->getRepository('App\Models\Entity\StatusOrcamento')->find($params->status);
+    $solicitacao = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento')->find($params->solicitacao);
+    $profissional = $entityManager->getRepository('App\Models\Entity\Profissional')->find($params->profissional);
+    $valor = $params->profissional;
+    $descricao = $params->descricao;
+
+    $orcamento = new Orcamento($status, $solicitacao, $profissional, $valor, $descricao);
+
+    $entityManager->persist($orcamento);
+    $entityManager->flush();
+        
+    $return = $response->withJson($horarios, 201)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
 });
 
 
