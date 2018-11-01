@@ -552,6 +552,13 @@ $app->get('/api/consulta/horario', function (Request $request, Response $respons
             return $return;
 });
 
+$app->get('/api/consulta/statusOrcamento', function (Request $request, Response $response) use ($app,$entityManager) {
+    $status = $entityManager->getRepository('App\Models\Entity\StatusOrcamento')->findAll();
+    $return = $response->withJson($status, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
 $app->post('/api/solicitar/orcamento', function (Request $request, Response $response) use ($app,$entityManager) {
         
     $params = (object) $request->getParams();
@@ -596,7 +603,7 @@ $app->post('/api/solicitar/orcamento', function (Request $request, Response $res
         ->withHeader('Content-type', 'application/json');
     return $return;
     }else{
-        $return = $response->withJson(['mensagem'=>"Já existe solicitação em aberto"], 409)
+        $return = $response->withJson(['mensagem'=>"Já existe uma solicitação em aberto para este serviço"], 409)
         ->withHeader('Content-type', 'application/json');
     return $return;
     }
@@ -610,19 +617,19 @@ $app->get('/api/consulta/solicitacao/{tipoUsuario}/{idUsuario}/{status}', functi
 
     $status = $route->getArgument('status');
     $repository = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento');
-    $solicitacao = null;
+    $solicitacoes = null;
     $usersRepository = null;
     if($tipoUsuario == "cliente"){
         $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
         $usuario = $usersRepository->find($idUsuario);
-        $solicitacao = $repository->findOneBy(array('usuario' => $usuario, 'status' => $status));
+        $solicitacoes = $repository->findBy(array('usuario' => $usuario, 'status' => $status));
     }elseif($tipoUsuario == "profissional"){
         $profissionalRepository = $entityManager->getRepository('App\Models\Entity\Profissional'); 
         $profissional = $profissionalRepository->find($idUsuario);
-        $solicitacao = $repository->findOneBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => $status));
+        $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => $status));
     }
     
-    $return = $response->withJson($solicitacao, 200)
+    $return = $response->withJson($solicitacoes, 200)
         ->withHeader('Content-type', 'application/json');
             return $return;
 });
@@ -631,9 +638,7 @@ $app->put('/api/cancelar/solicitacao/{id}', function (Request $request, Response
         
     $route = $request->getAttribute('route');
     $id = $route->getArgument('id');
-    
-    $repository = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento');
-    $solicitacao = $repository->find($id);
+    $solicitacao = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento')->find($id);
     
     $solicitacao->setStatus("F");
 
@@ -659,11 +664,30 @@ $app->post('/api/gravar/orcamento', function (Request $request, Response $respon
 
     $entityManager->persist($orcamento);
     $entityManager->flush();
-        
+    if($solicitacao->getOrcamento1()==null){
+        $solicitacao->setOrcamento1($orcamento);
+    } else{
+        $solicitacao->setOrcamento2($orcamento);
+        $solicitacao->setStatus("O");
+    }
+    $entityManager->persist($solicitacao);
+    $entityManager->flush();
+    
     $return = $response->withJson($orcamento, 201)
         ->withHeader('Content-type', 'application/json');
             return $return;
 });
 
+$app->get('/api/consulta/orcamento/{idProfissional}/{idStatus}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    
+    $status = $entityManager->getRepository('App\Models\Entity\StatusOrcamento')->find($route->getArgument('idStatus'));
+    $profissional = $entityManager->getRepository('App\Models\Entity\Profissional')->find($route->getArgument('idProfissional'));
+    $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional' => $profissional, 'status' => $status));
+
+    $return = $response->withJson($orcamentos, 200)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+}); 
 
 $app->run();
