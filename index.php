@@ -472,7 +472,7 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
             return $response->withJson($userBanco, 200)
             ->withHeader('Content-type', 'application/json');
         } 
-        return $response->withStatus(409, 'Já existe um usuário cadastrado para esse email.');
+        return $response->withStatus(404, 'E-mail não cadastrado.');
         
     });
 

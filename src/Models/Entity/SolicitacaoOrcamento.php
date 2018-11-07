@@ -53,6 +53,13 @@ class SolicitacaoOrcamento implements \JsonSerializable
     private $textoSolicitacao;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=false, name="endereco")
+     */
+    private $endereco;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Models\Entity\UrgenciaServico")
      */
     private $urgenciaServico;
@@ -67,12 +74,31 @@ class SolicitacaoOrcamento implements \JsonSerializable
      */
     private $horario;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\HorarioServico")
+     */
+    private $horarioAlternativo;
+
      /**
      * @var \DateTimeImmutable
      *
      * @ORM\Column(type="datetimetz_immutable", nullable=false, name="data_solcitacao")
      */
     private $dataSolicitacao;
+
+    /**
+     * @var \DateTimeImmutable
+     *
+     * @ORM\Column(type="datetimetz_immutable", nullable=false, name="data_servico")
+     */
+    private $dataServico;
+
+    /**
+     * @var \DateTimeImmutable
+     *
+     * @ORM\Column(type="datetimetz_immutable", nullable=false, name="data_alternativa")
+     */
+    private $dataAlternativa;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Models\Entity\Orcamento")
@@ -92,7 +118,7 @@ class SolicitacaoOrcamento implements \JsonSerializable
      */
     private $status;
 
-    public function __construct(?Usuario $usuario, ?AtividadeProfissional $atividade, ?Bairro $bairro, string $textoSolicitacao, ?UrgenciaServico $urgenciaServico,?LocalAtendimento $localAtendimento,?HorarioServico $horario)
+    public function __construct(?Usuario $usuario, ?AtividadeProfissional $atividade, ?Bairro $bairro, string $textoSolicitacao, ?UrgenciaServico $urgenciaServico,?LocalAtendimento $localAtendimento,?HorarioServico $horario, string $endereco, ?HorarioServico $horarioAlternativo, string $dataServico, string $dataAlternativa)
     {
         $this->usuario = $usuario;
         $this->atividade = $atividade;
@@ -103,6 +129,10 @@ class SolicitacaoOrcamento implements \JsonSerializable
         $this->horario = $horario;
         $this->dataSolicitacao = new \DateTimeImmutable('now');
         $this->status = "A";
+        $this->endereco = $endereco;
+        $this->horarioAlternativo = $horarioAlternativo;
+        $this->dataServico = new \DateTimeImmutable($dataServico);
+        $this->dataAlternativa = new \DateTimeImmutable($dataAlternativa);
     }
 
     public function getId(): int
@@ -150,6 +180,16 @@ class SolicitacaoOrcamento implements \JsonSerializable
         return $this;  
     }
 
+    public function getEndereco(): string
+    {
+        return $this->endereco;
+    }
+
+    public function setEndereco($endereco){
+        $this->endereco = $endereco;
+        return $this;  
+    }
+
     public function getUrgenciaServico(): ?UrgenciaServico
     {
         return $this->urgenciaServico;
@@ -180,9 +220,29 @@ class SolicitacaoOrcamento implements \JsonSerializable
         return $this;  
     }
 
+    public function getHorarioAlternativo(): ?HorarioServico
+    {
+        return $this->horarioAlternativo;
+    }
+
+    public function setHorarioAlternativo($horarioAlternativo){
+        $this->horarioAlternativo = $horarioAlternativo;
+        return $this;  
+    }
+
     public function getDataSolicitacao(): \DateTimeImmutable
     {
         return $this->dataSolicitacao;
+    }
+
+    public function getDataServico(): \DateTimeImmutable
+    {
+        return $this->dataServico;
+    }
+
+    public function getDataAlternativa(): \DateTimeImmutable
+    {
+        return $this->dataAlternativa;
     }
 
     public function getOrcamento1(): ?Orcamento
@@ -228,7 +288,10 @@ class SolicitacaoOrcamento implements \JsonSerializable
             'textoSolicitacao' => $this->getTextoSolicitacao(),
             'urgenciaServico' => $this->getUrgenciaServico(),
             'localAtendimento' => $this->getLocalAtendimento(),
+            'dataServico' => $this->getDataServico(),
             'horario' => $this->getHorario(),
+            'dataAlternativa' => $this->getDataAlternativa(),
+            'horarioAlternativo' => $this->getHorarioAlternativo(),
             'dataSolicitacao' => $this->getDataSolicitacao(),
             'orcamento1' => $this->getOrcamento1(),
             'orcamento2' => $this->getOrcamento2(),
