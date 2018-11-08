@@ -652,7 +652,8 @@ $app->post('/api/solicitar/orcamento', function (Request $request, Response $res
 
     $horarioRepository = $entityManager->getRepository('App\Models\Entity\HorarioServico');
     $horario = $horarioRepository->find($params->idHorario);
-    
+    $horarioAlternativo = $horarioRepository->find($params->idHorarioAlternativo);
+
     $localAtendimentoRepository = $entityManager->getRepository('App\Models\Entity\LocalAtendimento');
     $localAtendimento = $localAtendimentoRepository->find($params->idLocalAtendimento);
 
@@ -672,7 +673,7 @@ $app->post('/api/solicitar/orcamento', function (Request $request, Response $res
     ->getSingleScalarResult();
 
     if($solicitacaoAberta==0){
-    $solicitacao = new SolicitacaoOrcamento($usuario, $atividade, $bairro, $params->textoSolicitacao, $urgenciaServico, $localAtendimento, $horario);
+    $solicitacao = new SolicitacaoOrcamento($usuario, $atividade, $bairro, $params->textoSolicitacao, $urgenciaServico, $localAtendimento, $horario, $params->endereco, $horarioAlternativo, $params->dataServico, $params->dataAlternativa);
     
     $entityManager->persist($solicitacao);
     $entityManager->flush();
