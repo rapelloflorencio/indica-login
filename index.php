@@ -3,7 +3,8 @@ date_default_timezone_set("America/Sao_Paulo");
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 use App\Models\Entity\Usuario;
 use App\Models\Entity\Perfil;
 use App\Models\Entity\Profissional;
@@ -49,7 +50,7 @@ $authenticator = function($request, TokenAuthentication $tokenAuth){
  */
 $app->add(new TokenAuthentication([
     'path' =>   '/api',
-    'passthrough' => ['/api/login','/api/cadastro','/api/consulta','/api/validaSemSenha', '/api/alterarSenha/', "/api/imagens/", '/api/usuario/','/api/profissional/' ],
+    'passthrough' => ['/api/login','/api/cadastro','/api/consulta','/api/validaSemSenha', '/api/alterarSenha/', "/api/imagens/", '/api/usuario/','/api/profissional/', '/api/enviar/email' ],
     'authenticator' => $authenticator,
     'secure' => false
 ]));
@@ -768,5 +769,40 @@ $app->get('/api/consulta/orcamento/{idProfissional}/{idStatus}', function (Reque
         ->withHeader('Content-type', 'application/json');
             return $return;
 }); 
+
+$app->post('/api/enviar/email', function (Request $request, Response $response) use ($app) {      
+    $params = (object) $request->getParams();
+    $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
+try {
+    //Server settings
+    $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+    $mail->isSMTP();                                      // Set mailer to use SMTP
+    $mail->Host = 'mail.indicaerecomenda.com.br';         // Specify main and backup SMTP servers
+    $mail->SMTPAuth = true;                               // Enable SMTP authentication
+    $mail->Username = 'contato@indicaerecomenda.com.br'; // SMTP username
+    $mail->Password = 'y63mz8Db0L';                       // SMTP password
+    $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+    $mail->Port = 587;                                    // TCP port to connect to
+
+    //Recipients
+    $mail->setFrom('contato@indicaerecomenda.com.br', '');
+    $mail->addAddress($params->email);     // Add a recipient
+    
+    //Content
+    $mail->isHTML(true);                                  // Set email format to HTML
+    $mail->Subject = $params->assunto;
+    $mail->Body    = $params->mensagem;
+
+    $mail->send();
+    $return = $response->withJson(['mensagem'=>"E-mail enviado com sucesso."], 200)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+} catch (Exception $e) {
+    $return = $response->withJson(['mensagem'=>$mail->ErrorInfo], 409)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+}
+});
+
 
 $app->run();
