@@ -216,7 +216,7 @@ $app->post('/api/cadastro/profissional', function (Request $request, Response $r
     $id = $params->bairro;
     $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
     $bairro = $bairroRepository->find($id); 
-    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,$params->cpf,$params->cnpj,$params->frenterg,$params->versorg,$params->comprovante,$params->foto,$atividade_principal,$extra,$params->situacao_cadastral, $perfil,$params->identidade);
+    $profissional = new Profissional($params->nome,$params->fantasia,$params->password,$params->cep,$params->endereco,$params->complemento,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->telefone3,$params->telefone4,trim($params->cpf),trim($params->cnpj),$params->frenterg,$params->versorg,$params->comprovante,$params->foto,$atividade_principal,$extra,$params->situacao_cadastral, $perfil,$params->identidade);
     
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
     $userBanco = $usersRepository->findOneBy(array('email' => $profissional->getEmail()));
@@ -246,7 +246,7 @@ $app->post('/api/cadastro/profissional', function (Request $request, Response $r
     $userBanco = $usersRepository->findOneBy(array('cnpj' => $profissional->getCnpj()));
     
     if($userBanco != null){
-        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse CPF."], 409)
+        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse CNPJ."], 409)
         ->withHeader('Content-type', 'application/json');
     return $return;
     }
