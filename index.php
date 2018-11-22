@@ -487,7 +487,7 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
         }elseif($params->perfil == "profissional"){
             $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
         }
-        $userBanco = $usersRepository->findOneBy(array('email' => $params->email,'cpf' => $params->cpf,'telefone1' => $params->telefone1));
+        $userBanco = $usersRepository->findOneBy(array('email' => $params->email));
       
         if($userBanco != null){
            return $response->withJson($userBanco, 200)
@@ -702,11 +702,19 @@ $app->get('/api/consulta/solicitacao/{tipoUsuario}/{idUsuario}/{status}', functi
     if($tipoUsuario == "cliente"){
         $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
         $usuario = $usersRepository->find($idUsuario);
-        $solicitacoes = $repository->findBy(array('usuario' => $usuario, 'status' => $status));
+        if($status == "T"){
+            $solicitacoes = $repository->findBy(array('usuario' => $usuario)); 
+        } else{
+            $solicitacoes = $repository->findBy(array('usuario' => $usuario, 'status' => $status));
+        }
     }elseif($tipoUsuario == "profissional"){
         $profissionalRepository = $entityManager->getRepository('App\Models\Entity\Profissional'); 
         $profissional = $profissionalRepository->find($idUsuario);
-        $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => $status));
+        if($status == "T"){
+        $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal()));
+        } else{
+            $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => $status));
+        }
     }
     
     $return = $response->withJson($solicitacoes, 200)
