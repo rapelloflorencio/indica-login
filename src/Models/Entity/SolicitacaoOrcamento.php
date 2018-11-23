@@ -96,7 +96,7 @@ class SolicitacaoOrcamento implements \JsonSerializable
     /**
      * @var \DateTimeImmutable
      *
-     * @ORM\Column(type="datetimetz_immutable", nullable=false, name="data_alternativa")
+     * @ORM\Column(type="datetimetz_immutable", nullable=true, name="data_alternativa")
      */
     private $dataAlternativa;
 
@@ -246,7 +246,10 @@ class SolicitacaoOrcamento implements \JsonSerializable
 
     public function getDataAlternativa(): \DateTimeImmutable
     {
-        return $this->dataAlternativa;
+        if($this->dataAlternativa != null){
+            return $this->dataAlternativa;
+        }else 
+            return "";
     }
 
     public function getOrcamento1(): ?Orcamento
