@@ -132,7 +132,11 @@ class SolicitacaoOrcamento implements \JsonSerializable
         $this->endereco = $endereco;
         $this->horarioAlternativo = $horarioAlternativo;
         $this->dataServico = new \DateTimeImmutable($dataServico);
-        $this->dataAlternativa = new \DateTimeImmutable($dataAlternativa);
+        if($dataAlternativa != ""){
+            $this->dataAlternativa = new \DateTimeImmutable($dataAlternativa);
+        } else{
+            $this->dataAlternativa = null;
+        }
     }
 
     public function getId(): int

@@ -139,7 +139,7 @@ class Orcamento implements \JsonSerializable
         return [
             'id' => $this->getId(),
             'status' => $this->getStatus(),
-            'solicitacao' => $this->getSolicitacao(),
+            'solicitacao' => $this->getSolicitacao()->getId(),
             'profissional' => $this->getProfissional(),
             'valor' => $this->getValor(),
             'descricao' => $this->getDescricao()

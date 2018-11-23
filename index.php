@@ -756,7 +756,7 @@ $app->post('/api/gravar/orcamento', function (Request $request, Response $respon
         $solicitacao->setOrcamento1($orcamento);
     } else{
         $solicitacao->setOrcamento2($orcamento);
-        $solicitacao->setStatus("O");
+        $solicitacao->setStatus("F");
     }
     $entityManager->persist($solicitacao);
     $entityManager->flush();
