@@ -337,6 +337,38 @@ $app->put('/api/profissional/{id}', function (Request $request, Response $respon
     $atividade_principal = $atividadeRepository->find($request->getParam('atividade_principal'));
     $extra = $atividadeRepository->find($request->getParam('extra'));
 
+    $userBanco = $usersRepository->findOneBy(array('email' => $request->getParam('email')));
+
+    if($userBanco != null){
+        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse email."], 409)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+    }
+
+    $userBanco = $usersRepository->findOneBy(array('telefone1' => $request->getParam('telefone1')));
+    
+    if($userBanco != null){
+        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse telefone."], 409)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+    }
+
+    $userBanco = $usersRepository->findOneBy(array('cpf' => $request->getParam('cpf')));
+    
+    if($userBanco != null){
+        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse CPF."], 409)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+    }
+
+    $userBanco = $usersRepository->findOneBy(array('cnpj' => $request->getParam('cnpj')));
+    
+    if($userBanco != null){
+        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse CNPJ."], 409)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+    }
+
     $user->setNome($request->getParam('nome'))
         ->setNome_Fantasia($request->getParam('fantasia'))
         ->setPassword($request->getParam('password'))

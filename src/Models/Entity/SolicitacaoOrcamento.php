@@ -244,10 +244,10 @@ class SolicitacaoOrcamento implements \JsonSerializable
         return $this->dataServico;
     }
 
-    public function getDataAlternativa(): \DateTimeImmutable
+    public function getDataAlternativa(): string
     {
         if($this->dataAlternativa != null){
-            return $this->dataAlternativa;
+            return $this->dataAlternativa->format('Y-m-d');
         }else 
             return "";
     }
