@@ -27,9 +27,15 @@ class AtividadeProfissional implements \JsonSerializable
      */
     private $nome;
 
-    public function __construct(string $nome)
+    /**
+     * @ORM\Column(type="string")
+     */
+    private $mneumonico;
+
+    public function __construct(string $nome, string $mneumonico)
     {
         $this->nome = $nome;
+        $this->mneumonico = $mneumonico;
     }
 
     public function getId(): int
@@ -47,6 +53,16 @@ class AtividadeProfissional implements \JsonSerializable
         return $this;  
     }
 
+    public function getMneumonico(): string
+    {
+        return $this->mneumonico;
+    }
+
+    public function setMneumonico($mneumonico){
+        $this->mneumonico = $mneumonico;
+        return $this;  
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -55,6 +71,7 @@ class AtividadeProfissional implements \JsonSerializable
         return [
             'id' => $this->getId(),
             'nome' => $this->getNome(),
+            'mneumonico' => $this->getMneumonico()
         ];
     }
 }

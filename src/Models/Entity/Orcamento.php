@@ -61,6 +61,13 @@ class Orcamento implements \JsonSerializable
      */
     private $descricao;
 
+     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=false)
+     */
+    private $senha;
+
     public function __construct(?StatusOrcamento $status, ?SolicitacaoOrcamento $solicitacao, ?Profissional $profissional, int $valor, string $descricao)
     {
         $this->status = $status;
@@ -69,6 +76,7 @@ class Orcamento implements \JsonSerializable
         $this->valor = $valor;
         $this->descricao = $descricao;
         $this->data = new \DateTimeImmutable('now');
+        $this->senha = $solicitacao->getAtividade()->getMneumonico()."-".$profissional->getId()."-".$data->format(y)."-".$solicitacao->getId();
     }
 
     public function getId(): int
@@ -126,6 +134,16 @@ class Orcamento implements \JsonSerializable
         return $this;  
     }
 
+    public function getSenha(): string
+    {
+        return $this->senha;
+    }
+
+    public function setSenha($senha){
+        $this->senha = $senha;
+        return $this;  
+    }
+
     public function getData(): \DateTimeImmutable
     {
         return $this->data;
@@ -142,7 +160,8 @@ class Orcamento implements \JsonSerializable
             'solicitacao' => $this->getSolicitacao()->getId(),
             'profissional' => $this->getProfissional(),
             'valor' => $this->getValor(),
-            'descricao' => $this->getDescricao()
+            'descricao' => $this->getDescricao(),
+            'senha' => $this->getSenha()
         ];
     }
 }
