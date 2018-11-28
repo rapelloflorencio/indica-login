@@ -85,15 +85,17 @@ class AvaliacaoServico implements \JsonSerializable
     private $comentario;
     
 
-    public function __construct(?StatusOrcamento $status, ?SolicitacaoOrcamento $solicitacao, ?Profissional $profissional, int $valor, string $descricao)
+    public function __construct(?Orcamento $orcamento, string $dataTermino, int $valor, int $pontualidade,int $competencia, int $prazo, int $organizacao, int $atitude, string $comentario)
     {
-        $this->status = $status;
-        $this->solicitacao = $solicitacao;
-        $this->profissional = $profissional;
+        $this->orcamento = $orcamento;
+        $this->dataTermino = new \DateTimeImmutable($dataTermino);;
         $this->valor = $valor;
-        $this->descricao = $descricao;
-        $this->data = new \DateTimeImmutable('now');
-        $this->senha = $solicitacao->getAtividade()->getMneumonico()."-".$profissional->getId()."-".$data->format(y)."-".$solicitacao->getId();
+        $this->pontualidade = $pontualidade;
+        $this->competencia = $competencia;
+        $this->prazo = $prazo;
+        $this->organizacao = $organizacao;
+        $this->atitude = $atitude;
+        $this->comentario = $comentario;
     }
 
     public function getId(): int
@@ -101,33 +103,13 @@ class AvaliacaoServico implements \JsonSerializable
         return $this->id;
     }
 
-    public function getStatus(): ?StatusOrcamento
+    public function getOrcamento(): ?Orcamento
     {
-        return $this->status;
+        return $this->orcamento;
     }
 
-    public function setStatus($status){
-        $this->status = $status;
-        return $this;  
-    }
-
-    public function getSolicitacao(): ?SolicitacaoOrcamento
-    {
-        return $this->solicitacao;
-    }
-
-    public function setSolicitacao($solicitacao){
-        $this->solicitacao = $solicitacao;
-        return $this;  
-    }
-
-    public function getProfissional(): ?Profissional
-    {
-        return $this->profissional;
-    }
-
-    public function setProfissional($profissional){
-        $this->profissional = $profissional;
+    public function setOrcamento($orcamento){
+        $this->orcamento = $orcamento;
         return $this;  
     }
 
@@ -141,29 +123,69 @@ class AvaliacaoServico implements \JsonSerializable
         return $this;  
     }
 
-    public function getDescricao(): string
+    public function getPontualidade(): int
     {
-        return $this->descricao;
+        return $this->pontualidade;
     }
 
-    public function setDescricao($descricao){
-        $this->descricao = $descricao;
+    public function setPontualidade($pontualidade){
+        $this->pontualidade = $pontualidade;
         return $this;  
     }
 
-    public function getSenha(): string
+    public function getPrazo(): int
     {
-        return $this->senha;
+        return $this->prazo;
     }
 
-    public function setSenha($senha){
-        $this->senha = $senha;
+    public function setPrazo($prazo){
+        $this->prazo = $prazo;
         return $this;  
     }
 
-    public function getData(): \DateTimeImmutable
+    public function getOrganizacao(): int
     {
-        return $this->data;
+        return $this->organizacao;
+    }
+
+    public function setOrganizacao($organizacao){
+        $this->organizacao = $organizacao;
+        return $this;  
+    }
+
+    public function getCompetencia(): int
+    {
+        return $this->competencia;
+    }
+
+    public function setCompetencia($competencia){
+        $this->competencia = $competencia;
+        return $this;  
+    }
+
+    public function getAtitude(): int
+    {
+        return $this->atitude;
+    }
+
+    public function setAtitude($atitude){
+        $this->atitude = $atitude;
+        return $this;  
+    }
+
+    public function getComentario(): int
+    {
+        return $this->comentario;
+    }
+
+    public function setComentario($comentario){
+        $this->comentario = $comentario;
+        return $this;  
+    }
+
+    public function getDataTermino(): \DateTimeImmutable
+    {
+        return $this->dataTermino;
     }
 
     /**
@@ -173,12 +195,14 @@ class AvaliacaoServico implements \JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'status' => $this->getStatus(),
-            'solicitacao' => $this->getSolicitacao()->getId(),
-            'profissional' => $this->getProfissional(),
+            'orcamento' => $this->getOrcamento(),
             'valor' => $this->getValor(),
-            'descricao' => $this->getDescricao(),
-            'senha' => $this->getSenha()
+            'pontualidade' => $this->getPontualidade(),
+            'prazo' => $this->getPrazo(),
+            'organizacao' => $this->getOrganizacao(),
+            'atitude' => $this->getAtitude(),
+            'competencia' => $this->getCompetencia(),
+            'comentario' => $this->getComentario()
         ];
     }
 }

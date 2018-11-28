@@ -808,7 +808,8 @@ $app->get('/api/consulta/orcamento/{idProfissional}/{idStatus}', function (Reque
     $return = $response->withJson($orcamentos, 200)
         ->withHeader('Content-type', 'application/json');
             return $return;
-}); 
+});
+
 
 $app->post('/api/enviar/email', function (Request $request, Response $response) use ($app) {      
     $params = (object) $request->getParams();
