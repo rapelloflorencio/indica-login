@@ -16,6 +16,7 @@ use App\Models\Entity\SolicitacaoOrcamento;
 use App\Models\Entity\StatusOrcamento;
 use App\Models\Entity\LocalAtendimento;
 use App\Models\Entity\UrgenciaServico;
+use App\Models\Entity\AvaliacaoServico;
 use Slim\App;
 use Slim\Container;
 use Doctrine\ORM\EntityManager;
@@ -810,6 +811,31 @@ $app->get('/api/consulta/orcamento/{idProfissional}/{idStatus}', function (Reque
             return $return;
 });
 
+$app->post('/api/gravar/avaliacao/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+    $params = (object) $request->getParams();
+    
+    $orcamento = $entityManager->getRepository('App\Models\Entity\Orcamento')->find($params->orcamento_id);
+    
+    $avaliacao = new AvaliacaoServico($orcamento,  $params->dataTermino, $params->valor, $params->pontualidade,$params->competencia, $params->prazo, $params->organizacao, $params->atitude, $params->comentario);
+
+    $entityManager->persist($avaliacao);
+    $entityManager->flush();
+    
+    $return = $response->withJson($avaliacao, 201)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+});
+
+$app->get('/api/consulta/avaliacao/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    
+    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findAll();
+
+    $return = $response->withJson($avaliacoes, 200)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+});
 
 $app->post('/api/enviar/email', function (Request $request, Response $response) use ($app) {      
     $params = (object) $request->getParams();
