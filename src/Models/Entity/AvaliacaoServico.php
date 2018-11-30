@@ -6,7 +6,7 @@ namespace App\Models\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Models\Entity\Orcamento;
-
+use App\Models\Entity\AtividadeProfissional;
 /**
  * The User class demonstrates how to annotate a simple
  * PHP class to act as a Doctrine entity.
@@ -84,6 +84,10 @@ class AvaliacaoServico implements \JsonSerializable
      */
     private $comentario;
     
+     /**
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\AtividadeProfissional")
+     */
+    private $atividade;
 
     public function __construct(?Orcamento $orcamento, string $dataTermino, int $valor, int $pontualidade,int $competencia, int $prazo, int $organizacao, int $atitude, string $comentario)
     {
@@ -96,6 +100,7 @@ class AvaliacaoServico implements \JsonSerializable
         $this->organizacao = $organizacao;
         $this->atitude = $atitude;
         $this->comentario = $comentario;
+        $this->atividade = $orcamento->getSolicitacao()->getAtividade();
     }
 
     public function getId(): int
@@ -173,7 +178,7 @@ class AvaliacaoServico implements \JsonSerializable
         return $this;  
     }
 
-    public function getComentario(): int
+    public function getComentario(): String
     {
         return $this->comentario;
     }
@@ -186,6 +191,11 @@ class AvaliacaoServico implements \JsonSerializable
     public function getDataTermino(): \DateTimeImmutable
     {
         return $this->dataTermino;
+    }
+
+    public function getAtividade(): ?AtividadeProfissional
+    {
+        return $this->atividade;
     }
 
     /**
@@ -202,7 +212,8 @@ class AvaliacaoServico implements \JsonSerializable
             'organizacao' => $this->getOrganizacao(),
             'atitude' => $this->getAtitude(),
             'competencia' => $this->getCompetencia(),
-            'comentario' => $this->getComentario()
+            'comentario' => $this->getComentario(),
+            'atividade' => $this->getAtividade()
         ];
     }
 }

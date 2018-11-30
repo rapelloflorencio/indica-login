@@ -828,10 +828,17 @@ $app->post('/api/gravar/avaliacao/profissional', function (Request $request, Res
 });
 
 $app->get('/api/consulta/avaliacao/profissional', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findAll();
+    $return = $response->withJson($avaliacoes, 200)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+});
+
+$app->get('/api/consulta/avaliacao/profissional/{id_atividade}', function (Request $request, Response $response) use ($app,$entityManager) {
     $route = $request->getAttribute('route');
     
-    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findAll();
-
+    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findBy(array('atividade' => $route->getArgument('id_atividade')));
     $return = $response->withJson($avaliacoes, 200)
         ->withHeader('Content-type', 'application/json');
             return $return;
