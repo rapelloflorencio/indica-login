@@ -76,7 +76,7 @@ class Orcamento implements \JsonSerializable
         $this->valor = $valor;
         $this->descricao = $descricao;
         $this->data = new \DateTimeImmutable('now');
-        $this->senha = $solicitacao->getAtividade()->getMneumonico()."-".$profissional->getId()."-".$this->data->format('y')."-".$solicitacao->getId();
+        $this->senha = $solicitacao->getAtividade()->getMneumonico()."-00".$profissional->getId()."-000".$solicitacao->getId()."-".$this->data->format('y');
     }
 
     public function getId(): int

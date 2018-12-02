@@ -17,6 +17,7 @@ use App\Models\Entity\StatusOrcamento;
 use App\Models\Entity\LocalAtendimento;
 use App\Models\Entity\UrgenciaServico;
 use App\Models\Entity\AvaliacaoServico;
+use App\Models\Entity\Parametro;
 use Slim\App;
 use Slim\Container;
 use Doctrine\ORM\EntityManager;
@@ -878,5 +879,45 @@ try {
 }
 });
 
+$app->get('/api/consulta/parametro/{nome}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('nome');
+    $repository = $entityManager->getRepository('App\Models\Entity\Parametro');
+    $parametro = $repository->findOneBy($id);        
 
+    $return = $response->withJson($parametro, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+$app->post('/api/parametro', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+    $params = (object) $request->getParams();
+    $parametro = new Parametro($params->nome, $params->valor);
+    
+    $entityManager->persist($parametro);
+    $entityManager->flush();
+       
+    $return = $response->withJson($parametro, 201)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+$app->put('/api/parametro/{nome}', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    $route = $request->getAttribute('route');
+    $nome = $route->getArgument('nome');
+
+    $parametro = $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy($nome);
+    
+    $parametro->setValor($request->getParam('valor'));
+
+    $entityManager->persist($parametro);
+    $entityManager->flush();        
+  
+    $return = $response->withJson($parametro, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+
+});
 $app->run();
