@@ -823,6 +823,12 @@ $app->post('/api/gravar/avaliacao/profissional', function (Request $request, Res
     $entityManager->persist($avaliacao);
     $entityManager->flush();
     
+    $status = $entityManager->getRepository('App\Models\Entity\StatusOrcamento')->find(6);
+    $orcamento->setStatus($status);
+
+    $entityManager->persist($orcamento);
+    $entityManager->flush();
+
     $return = $response->withJson($avaliacao, 201)
         ->withHeader('Content-type', 'application/json');
             return $return;
@@ -879,11 +885,21 @@ try {
 }
 });
 
+$app->get('/api/consulta/parametro', function (Request $request, Response $response) use ($app,$entityManager) {
+   
+    $repository = $entityManager->getRepository('App\Models\Entity\Parametro');
+    $parametros = $repository->findAll();        
+
+    $return = $response->withJson($parametros, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
 $app->get('/api/consulta/parametro/{nome}', function (Request $request, Response $response) use ($app,$entityManager) {
     $route = $request->getAttribute('route');
-    $id = $route->getArgument('nome');
+    $nome = $route->getArgument('nome');
     $repository = $entityManager->getRepository('App\Models\Entity\Parametro');
-    $parametro = $repository->findOneBy($id);        
+    $parametro = $repository->findOneBy(array('nome'=>$nome));        
 
     $return = $response->withJson($parametro, 200)
         ->withHeader('Content-type', 'application/json');
@@ -908,7 +924,7 @@ $app->put('/api/parametro/{nome}', function (Request $request, Response $respons
     $route = $request->getAttribute('route');
     $nome = $route->getArgument('nome');
 
-    $parametro = $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy($nome);
+    $parametro = $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>$nome));
     
     $parametro->setValor($request->getParam('valor'));
 
