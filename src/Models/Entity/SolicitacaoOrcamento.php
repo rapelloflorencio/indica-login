@@ -13,6 +13,7 @@ use App\Models\Entity\HorarioServico;
 use App\Models\Entity\Orcamento;
 use App\Models\Entity\LocalAtendimento;
 use App\Models\Entity\UrgenciaServico;
+use App\Models\Entity\Profissional;
 
 /**
  * The User class demonstrates how to annotate a simple
@@ -118,7 +119,12 @@ class SolicitacaoOrcamento implements \JsonSerializable
      */
     private $status;
 
-    public function __construct(?Usuario $usuario, ?AtividadeProfissional $atividade, ?Bairro $bairro, string $textoSolicitacao, ?UrgenciaServico $urgenciaServico,?LocalAtendimento $localAtendimento,?HorarioServico $horario, string $endereco, ?HorarioServico $horarioAlternativo, string $dataServico, string $dataAlternativa)
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\Profissional", nullable=true)
+     */
+    private $favorito;
+
+    public function __construct(?Usuario $usuario, ?AtividadeProfissional $atividade, ?Bairro $bairro, string $textoSolicitacao, ?UrgenciaServico $urgenciaServico,?LocalAtendimento $localAtendimento,?HorarioServico $horario, string $endereco, ?HorarioServico $horarioAlternativo, string $dataServico, string $dataAlternativa, ?Profissional $favorito)
     {
         $this->usuario = $usuario;
         $this->atividade = $atividade;
@@ -137,6 +143,7 @@ class SolicitacaoOrcamento implements \JsonSerializable
         } else{
             $this->dataAlternativa = null;
         }
+        $this->favorito = $favorito;
     }
 
     public function getId(): int
@@ -282,6 +289,16 @@ class SolicitacaoOrcamento implements \JsonSerializable
         return $this;  
     }
 
+    public function getFavorito(): ?Profissional
+    {
+        return $this->favorito;
+    }
+
+    public function setFavorito($favorito){
+        $this->favorito = $favorito;
+        return $this;  
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -302,7 +319,8 @@ class SolicitacaoOrcamento implements \JsonSerializable
             'dataSolicitacao' => $this->getDataSolicitacao(),
             'orcamento1' => $this->getOrcamento1(),
             'orcamento2' => $this->getOrcamento2(),
-            'status' => $this->getStatus()
+            'status' => $this->getStatus(),
+            'favorito' => $this->getFavorito()
         ];
     }
 }

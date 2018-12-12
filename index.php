@@ -695,6 +695,11 @@ $app->post('/api/solicitar/orcamento', function (Request $request, Response $res
     $urgenciaServicoRepository = $entityManager->getRepository('App\Models\Entity\UrgenciaServico');
     $urgenciaServico = $urgenciaServicoRepository->find($params->idUrgencia);
 
+    $favorito = null;
+    if($params->idFavorito != ""){
+    $profissionalRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+    $favorito = $profissionalRepository->find($params->idFavorito);
+    }
     $solicitacaoRepository = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento');
     $solicitacaoAberta = $solicitacaoRepository->createQueryBuilder('u')
     ->select('count(u.id)')
@@ -708,7 +713,7 @@ $app->post('/api/solicitar/orcamento', function (Request $request, Response $res
     ->getSingleScalarResult();
 
     if($solicitacaoAberta==0){
-    $solicitacao = new SolicitacaoOrcamento($usuario, $atividade, $bairro, $params->textoSolicitacao, $urgenciaServico, $localAtendimento, $horario, $params->endereco, $horarioAlternativo, $params->dataServico, $params->dataAlternativa);
+    $solicitacao = new SolicitacaoOrcamento($usuario, $atividade, $bairro, $params->textoSolicitacao, $urgenciaServico, $localAtendimento, $horario, $params->endereco, $horarioAlternativo, $params->dataServico, $params->dataAlternativa, $favorito);
     
     $entityManager->persist($solicitacao);
     $entityManager->flush();
@@ -902,6 +907,31 @@ $app->get('/api/consulta/parametro/{nome}', function (Request $request, Response
     $parametro = $repository->findOneBy(array('nome'=>$nome));        
 
     $return = $response->withJson($parametro, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+$app->get('/api/consulta/favoritos/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    $id_usuario = $route->getArgument('id');
+    $repository = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento');
+    $solicitacoes = $repository->findBy(array('usuario'=>$id_usuario));        
+    $favoritos = array();
+    foreach ($solicitacoes as $solicitacao){
+        if($solicitacao->getOrcamento1()!= null){
+            if($solicitacao->getOrcamento1()->getStatus()->getId()==6){
+            $favoritos[] = $solicitacao->getOrcamento1()->getProfissional();
+            continue;
+            }
+        } elseif($solicitacao->getOrcamento2()!= null){
+            if($solicitacao->getOrcamento2()->getStatus()->getId()==6){
+            $favoritos[] = $solicitacao->getOrcamento2()->getProfissional();
+            continue;
+            }
+        }
+    }
+
+    $return = $response->withJson($favoritos, 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
 });
