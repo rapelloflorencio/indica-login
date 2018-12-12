@@ -120,7 +120,7 @@ class SolicitacaoOrcamento implements \JsonSerializable
     private $status;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Models\Entity\Profissional", nullable=true)
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\Profissional")
      */
     private $favorito;
 
