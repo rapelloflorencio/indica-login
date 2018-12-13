@@ -751,8 +751,18 @@ $app->get('/api/consulta/solicitacao/{tipoUsuario}/{idUsuario}/{status}', functi
         $profissional = $profissionalRepository->find($idUsuario);
         if($status == "T"){
         $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal()));
+        if($profissional->getAtividade_Extra() != null){
+            $solicitacoes_extra = $repository->findBy(array('atividade' => $profissional->getAtividade_Extra()));
+            $result = array_merge($solicitacoes, $solicitacoes_extra);
+            $solicitacoes = $result;
+        }
         } else{
             $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => $status));
+            if($profissional->getAtividade_Extra() != null){
+                $solicitacoes_extra = $repository->findBy(array('atividade' => $profissional->getAtividade_Extra(), 'status' => $status));
+                $result = array_merge($solicitacoes, $solicitacoes_extra);
+                $solicitacoes = $result;
+            }
         }
     }
     
