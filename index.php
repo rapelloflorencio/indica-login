@@ -946,6 +946,30 @@ $app->get('/api/consulta/favoritos/{id}', function (Request $request, Response $
     return $return;
 });
 
+$app->get('/api/consulta/nota/profissional/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+    try{ 
+     $route = $request->getAttribute('route');
+     $id = $route->getArgument('id');      
+     $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional'=>$id));
+     $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findBy(array('orcamento'=>$orcamentos));
+     $somatorio = 0;
+     $divisor = 0;
+     $media = 0;
+     foreach ($avaliacoes as $avaliacao){
+         $somatorio = $somatorio + $avaliacao->getPontualidade() + $avaliacao->getCompetencia() + $avaliacao->getPrazo() + $avaliacao->getOrganizacao() + $avaliacao->getAtitude();
+         $divisor=$divisor+5;
+     }
+     $media = $somatorio/$divisor;
+     $return = $response->withJson(['nota'=>number_format($media,1,',','')], 200)
+         ->withHeader('Content-type', 'application/json');
+     return $return;
+ }catch(Exception $e){
+     $return = $response->withJson(['nota'=>0], 200)
+         ->withHeader('Content-type', 'application/json');
+     return $return;
+ }
+ });
+
 $app->post('/api/parametro', function (Request $request, Response $response) use ($app,$entityManager) {
         
     $params = (object) $request->getParams();
