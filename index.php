@@ -339,38 +339,6 @@ $app->put('/api/profissional/{id}', function (Request $request, Response $respon
     $atividade_principal = $atividadeRepository->find($request->getParam('atividade_principal'));
     $extra = $atividadeRepository->find($request->getParam('extra'));
 
-    $userBanco = $usersRepository->findOneBy(array('email' => $request->getParam('email')));
-
-    if($userBanco != null){
-        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse email."], 409)
-        ->withHeader('Content-type', 'application/json');
-    return $return;
-    }
-
-    $userBanco = $usersRepository->findOneBy(array('telefone1' => $request->getParam('telefone1')));
-    
-    if($userBanco != null){
-        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse telefone."], 409)
-        ->withHeader('Content-type', 'application/json');
-    return $return;
-    }
-
-    $userBanco = $usersRepository->findOneBy(array('cpf' => $request->getParam('cpf')));
-    
-    if($userBanco != null){
-        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse CPF."], 409)
-        ->withHeader('Content-type', 'application/json');
-    return $return;
-    }
-
-    $userBanco = $usersRepository->findOneBy(array('cnpj' => $request->getParam('cnpj')));
-    
-    if($userBanco != null){
-        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse CNPJ."], 409)
-        ->withHeader('Content-type', 'application/json');
-    return $return;
-    }
-
     $user->setNome($request->getParam('nome'))
         ->setNome_Fantasia($request->getParam('fantasia'))
         ->setPassword($request->getParam('password'))
@@ -866,19 +834,20 @@ $app->get('/api/consulta/avaliacao/profissional/{id_atividade}', function (Reque
             return $return;
 });
 
-$app->post('/api/enviar/email', function (Request $request, Response $response) use ($app) {      
+$app->post('/api/enviar/email', function (Request $request, Response $response) use ($app,$entityManager) {      
     $params = (object) $request->getParams();
     $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
 try {
     //Server settings
-    $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+    $mail->SMTPDebug = 3;                                 // Enable verbose debug output
     $mail->isSMTP();                                      // Set mailer to use SMTP
     $mail->Host = 'mail.indicaerecomenda.com.br';         // Specify main and backup SMTP servers
     $mail->SMTPAuth = true;                               // Enable SMTP authentication
     $mail->Username = 'contato@indicaerecomenda.com.br'; // SMTP username
-    $mail->Password = 'y63mz8Db0L';                       // SMTP password
+    $senha = $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"senha_email"));
+    $mail->Password = $senha;                             // SMTP password
     $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-    $mail->Port = 587;                                    // TCP port to connect to
+    $mail->Port = 587;                                    // TCP port to connect to 587
 
     //Recipients
     $mail->setFrom('contato@indicaerecomenda.com.br', '');
@@ -947,29 +916,28 @@ $app->get('/api/consulta/favoritos/{id}', function (Request $request, Response $
 });
 
 $app->get('/api/consulta/nota/profissional/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
-    try{ 
-     $route = $request->getAttribute('route');
-     $id = $route->getArgument('id');      
-     $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional'=>$id));
-     $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findBy(array('orcamento'=>$orcamentos));
-     $somatorio = 0;
-     $divisor = 0;
-     $media = 0;
-     foreach ($avaliacoes as $avaliacao){
-         $somatorio = $somatorio + $avaliacao->getPontualidade() + $avaliacao->getCompetencia() + $avaliacao->getPrazo() + $avaliacao->getOrganizacao() + $avaliacao->getAtitude();
-         $divisor=$divisor+5;
-     }
-     $media = $somatorio/$divisor;
-     $return = $response->withJson(['nota'=>number_format($media,1,',','')], 200)
-         ->withHeader('Content-type', 'application/json');
-     return $return;
- }catch(Exception $e){
-     $return = $response->withJson(['nota'=>0], 200)
-         ->withHeader('Content-type', 'application/json');
-     return $return;
- }
- });
-
+   try{ 
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('id');      
+    $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional'=>$id));
+    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findBy(array('orcamento'=>$orcamentos));
+    $somatorio = 0;
+    $divisor = 0;
+    $media = 0;
+    foreach ($avaliacoes as $avaliacao){
+        $somatorio = $somatorio + $avaliacao->getPontualidade() + $avaliacao->getCompetencia() + $avaliacao->getPrazo() + $avaliacao->getOrganizacao() + $avaliacao->getAtitude();
+        $divisor=$divisor+5;
+    }
+    $media = $somatorio/$divisor;
+    $return = $response->withJson(['nota'=>number_format($media,1,',','')], 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+}catch(Exception $e){
+    $return = $response->withJson(['nota'=>0], 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+}
+});
 $app->post('/api/parametro', function (Request $request, Response $response) use ($app,$entityManager) {
         
     $params = (object) $request->getParams();
