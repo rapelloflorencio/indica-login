@@ -351,8 +351,6 @@ $app->put('/api/profissional/{id}', function (Request $request, Response $respon
         ->setTelefone2($request->getParam('telefone2'))
         ->setTelefone3($request->getParam('telefone3'))
         ->setTelefone4($request->getParam('telefone4'))
-        ->setCpf($request->getParam('cpf'))
-        ->setCnpj($request->getParam('cnpj'))
         ->setImagem($request->getParam('foto'))
         ->setFrenterg($request->getParam('frenterg'))
         ->setVersorg($request->getParam('versorg'))
@@ -363,6 +361,17 @@ $app->put('/api/profissional/{id}', function (Request $request, Response $respon
         ->setPerfil($perfil)
         ->setIdentidade($request->getParam('identidade'));
 
+        if($request->getParam('cpf')==""){
+            $user->setCpf(null);
+        }else{
+            $user->setCpf($request->getParam('cpf'));
+        }
+
+        if($request->getParam('cnpj')==""){
+            $user->setCnpj(null);
+        }else{
+            $user->setCnpj($request->getParam('cnpj'));
+        }
     /**
      * Persiste a entidade no banco de dados
      */
