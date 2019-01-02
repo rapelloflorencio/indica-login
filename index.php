@@ -17,6 +17,7 @@ use App\Models\Entity\StatusOrcamento;
 use App\Models\Entity\LocalAtendimento;
 use App\Models\Entity\UrgenciaServico;
 use App\Models\Entity\AvaliacaoServico;
+use App\Models\Entity\Servico;
 use App\Models\Entity\Parametro;
 use Slim\App;
 use Slim\Container;
@@ -976,5 +977,55 @@ $app->put('/api/parametro/{nome}', function (Request $request, Response $respons
         ->withHeader('Content-type', 'application/json');
     return $return;
 
+});
+
+$app->post('/api/gravar/inicio/servico', function (Request $request, Response $response) use ($app,$entityManager) {
+        
+    $params = (object) $request->getParams();
+    
+    $orcamento = $entityManager->getRepository('App\Models\Entity\Orcamento')->find($params->orcamento_id);
+    $solicitacao = $entityManager->getRepository('App\Models\Entity\Solicitacao')->find($params->solicitacao_id);
+
+    $servico = new Servico($solicitacao, $orcamento,  $params->dataInicio, $params->valorInicialServico, $params->valorInicialMaoObra,$params->prazoInicial);
+    $entityManager->persist($servico);
+    $entityManager->flush();
+    
+    $return = $response->withJson($servico, 201)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+});
+
+$app->put('/api/gravar/final/servico/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('id');
+
+    $servico = $entityManager->getRepository('App\Models\Entity\Servico')->find($id);
+    
+    $servico->setDataTermino($request->getParam('dataTermino'));
+    $servico->setDataPagamento($request->getParam('dataPagamento'));
+    $servico->setValorTotalServico($request->getParam('valorTotalServico'));
+    $servico->setValorTotalMaoObra($request->getParam('valorTotalMaoObra'));
+    $servico->setValorTotalAPagar($request->getParam('valorTotalAPagar'));
+    $servico->setStatus("F");
+
+    $entityManager->persist($servico);
+    $entityManager->flush();        
+  
+    $return = $response->withJson($servico, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+
+});
+
+$app->get('/api/consulta/servico/por/orcamento/{id_orcamento}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    $id_orcamento = $route->getArgument('id_orcamento');
+    $repository = $entityManager->getRepository('App\Models\Entity\Servico');
+    $servico = $repository->findOneBy(array('orcamento'=>$id_orcamento));        
+
+    $return = $response->withJson($servico, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
 });
 $app->run();
