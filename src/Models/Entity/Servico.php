@@ -182,6 +182,9 @@ class Servico implements \JsonSerializable
 
     public function getDataTermino(): \DateTimeImmutable
     {
+        if($this->dataTermino == null){
+            return new \DateTimeImmutable("9999-01-01");
+        }
         return $this->dataTermino;
     }
 
@@ -192,8 +195,12 @@ class Servico implements \JsonSerializable
 
     public function getDataPagamento(): \DateTimeImmutable
     {
+        if($this->dataPagamento == null){
+            return new \DateTimeImmutable("9999-01-01");
+        }
         return $this->dataPagamento;
     }
+
 
     public function setDataPagamento($dataPagamento){
         $this->dataPagamento = new \DateTimeImmutable($dataPagamento);
@@ -202,6 +209,9 @@ class Servico implements \JsonSerializable
 
     public function getValorTotalServico(): int
     {
+        if($this->valorTotalServico==null){
+        return 0;
+        }
         return $this->valorTotalServico;
     }
 
@@ -212,6 +222,9 @@ class Servico implements \JsonSerializable
 
     public function getValorTotalMaoObra(): int
     {
+        if($this->valorTotalMaoObra==null){
+        return 0;
+        }
         return $this->valorTotalMaoObra;
     }
 
@@ -222,6 +235,9 @@ class Servico implements \JsonSerializable
 
     public function getValorTotalAPagar(): int
     {
+        if($this->valorTotalAPagar==null){
+        return 0;
+        }
         return $this->valorTotalAPagar;
     }
 

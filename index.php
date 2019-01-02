@@ -986,7 +986,7 @@ $app->post('/api/gravar/inicio/servico', function (Request $request, Response $r
     $params = (object) $request->getParams();
     
     $orcamento = $entityManager->getRepository('App\Models\Entity\Orcamento')->find($params->orcamento_id);
-    $solicitacao = $entityManager->getRepository('App\Models\Entity\Solicitacao')->find($params->solicitacao_id);
+    $solicitacao = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento')->find($params->solicitacao_id);
 
     $servico = new Servico($solicitacao, $orcamento,  $params->dataInicio, $params->valorInicialServico, $params->valorInicialMaoObra,$params->prazoInicial);
     $entityManager->persist($servico);
