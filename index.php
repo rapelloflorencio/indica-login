@@ -685,6 +685,8 @@ $app->post('/api/solicitar/orcamento', function (Request $request, Response $res
     ->setParameter('usuario', $usuario)
     ->andWhere('u.atividade = :atividade')
     ->setParameter('atividade', $atividade)
+    ->andWhere('u.bairro = :bairro')
+    ->setParameter('bairro', $bairro)
     ->andWhere('u.status = :status')
     ->setParameter('status', "A")
     ->getQuery()
