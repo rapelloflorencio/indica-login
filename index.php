@@ -17,6 +17,7 @@ use App\Models\Entity\StatusOrcamento;
 use App\Models\Entity\LocalAtendimento;
 use App\Models\Entity\UrgenciaServico;
 use App\Models\Entity\AvaliacaoServico;
+use App\Models\Entity\AvaliacaoCliente;
 use App\Models\Entity\Servico;
 use App\Models\Entity\Parametro;
 use Slim\App;
@@ -1013,8 +1014,12 @@ $app->put('/api/gravar/final/servico/{id}', function (Request $request, Response
 
     $entityManager->persist($servico);
     $entityManager->flush();        
-  
-    $return = $response->withJson($servico, 200)
+    
+    $avaliacaoCliente = new AvaliacaoCliente($servico->getSolicitacao()->getUsuario(), $servico, $request->getParam('desisteAdiaCancelaServico'), $request->getParam('pagaCombinado'),$request->getParam('exigeAlemCombinado'));
+    $entityManager->persist($avaliacaoCliente);
+    $entityManager->flush(); 
+
+    $return = $response->withJson(['servico'=>$servico, 'avaliacaoCliente'=>$avaliacaoCliente], 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
 
@@ -1026,7 +1031,9 @@ $app->get('/api/consulta/servico/por/orcamento/{id_orcamento}', function (Reques
     $repository = $entityManager->getRepository('App\Models\Entity\Servico');
     $servico = $repository->findOneBy(array('orcamento'=>$id_orcamento));        
 
-    $return = $response->withJson($servico, 200)
+    $avaliacaoCliente = $entityManager->getRepository('App\Models\Entity\AvaliacaoCliente')->findOneBy(array('servico'=>$servico));
+
+    $return = $response->withJson(['servico'=>$servico, 'avaliacaoCliente'=>$avaliacaoCliente], 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
 });

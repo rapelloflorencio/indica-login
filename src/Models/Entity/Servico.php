@@ -95,7 +95,21 @@ class Servico implements \JsonSerializable
      *
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $valorTotalAPagar;
+    private $valorRemunerado;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $valorAceiteOrcamento;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $valorDevidoAjustado;
 
     /**
      * @var string
@@ -233,16 +247,43 @@ class Servico implements \JsonSerializable
         return $this;  
     }
 
-    public function getValorTotalAPagar(): int
+
+    public function getValorRemunerado(): int
     {
-        if($this->valorTotalAPagar==null){
+        if($this->valorRemunerado==null){
         return 0;
         }
-        return $this->valorTotalAPagar;
+        return $this->valorRemunerado;
     }
 
-    public function setValorTotalAPagar($valorTotalAPagar){
-        $this->valorTotalAPagar = $valorTotalAPagar;
+    public function setValorRemunerado($valorRemunerado){
+        $this->valorRemunerado = $valorRemunerado;
+        return $this;  
+    }
+
+    public function getValorAceiteOrcamento(): int
+    {
+        if($this->valorAceiteOrcamento==null){
+        return 0;
+        }
+        return $this->valorAceiteOrcamento;
+    }
+
+    public function setValorAceiteOrcamento($valorAceiteOrcamento){
+        $this->valorAceiteOrcamento = $valorAceiteOrcamento;
+        return $this;  
+    }
+
+    public function getValorDevidoAjustado(): int
+    {
+        if($this->valorDevidoAjustado==null){
+        return 0;
+        }
+        return $this->valorDevidoAjustado;
+    }
+
+    public function setValorDevidoAjustado($valorDevidoAjustado){
+        $this->valorDevidoAjustado = $valorDevidoAjustado;
         return $this;  
     }
 
@@ -273,7 +314,9 @@ class Servico implements \JsonSerializable
             'dataPagamento' => $this->getDataPagamento(),
             'valorTotalServico' => $this->getValorTotalServico(),
             'valorTotalMaoObra' => $this->getValorTotalMaoObra(),
-            'valorTotalAPagar' => $this->getValorTotalAPagar(),
+            'valorRemunerado' => $this->getValorRemunerado(),
+            'valorAceiteOrcamento' => $this->getValorAceiteOrcamento(),
+            'valorDevidoAjustado' => $this->getValorDevidoAjustado(),
             'status' => $this->getStatus()
         ];
     }
