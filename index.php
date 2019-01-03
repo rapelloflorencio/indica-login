@@ -1009,7 +1009,9 @@ $app->put('/api/gravar/final/servico/{id}', function (Request $request, Response
     $servico->setDataPagamento($request->getParam('dataPagamento'));
     $servico->setValorTotalServico($request->getParam('valorTotalServico'));
     $servico->setValorTotalMaoObra($request->getParam('valorTotalMaoObra'));
-    $servico->setValorTotalAPagar($request->getParam('valorTotalAPagar'));
+    $servico->setValorRemunerado($request->getParam('valorRemunerado'));
+    $servico->setValorAceiteOrcamento($request->getParam('valorAceiteOrcamento'));
+    $servico->setValorDevidoAjustado($request->getParam('valorDevidoAjustado'));
     $servico->setStatus("F");
 
     $entityManager->persist($servico);
