@@ -61,7 +61,14 @@ class AvaliacaoCliente implements \JsonSerializable
      */
     private $exigeAlemCombinado;
 
-    public function __construct(?Usuario $usuario, ?Servico $servico, int $desisteAdiaCancelaServico, int $pagaCombinado,int $exigeAlemCombinado)
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $comentario;
+
+    public function __construct(?Usuario $usuario, ?Servico $servico, int $desisteAdiaCancelaServico, int $pagaCombinado,int $exigeAlemCombinado, string $comentario)
     {
         $this->usuario = $usuario;
         $this->servico = $servico;
@@ -69,6 +76,7 @@ class AvaliacaoCliente implements \JsonSerializable
         $this->desisteAdiaCancelaServico = $desisteAdiaCancelaServico;
         $this->pagaCombinado = $pagaCombinado;
         $this->exigeAlemCombinado = $exigeAlemCombinado;
+        $this->comentario = $comentario;
     }
 
     public function getId(): int
@@ -131,6 +139,16 @@ class AvaliacaoCliente implements \JsonSerializable
         return $this;  
     }
 
+    public function getComentario(): String
+    {
+        return $this->comentario;
+    }
+
+    public function setComentario($comentario){
+        $this->comentario = $comentario;
+        return $this;  
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -143,7 +161,8 @@ class AvaliacaoCliente implements \JsonSerializable
             'dataAvaliacao' => $this->getDataAvaliacao(),
             'desisteAdiaCancelaServico' => $this->getDesisteAdiaCancelaServico(),
             'pagaCombinado' => $this->getPagaCombinado(),
-            'exigeAlemCombinado' => $this->getExigeAlemCombinado()
+            'exigeAlemCombinado' => $this->getExigeAlemCombinado(),
+            'comentario' => $this->getComentario()
         ];
     }
 }

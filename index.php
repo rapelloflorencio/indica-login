@@ -1017,7 +1017,7 @@ $app->put('/api/gravar/final/servico/{id}', function (Request $request, Response
     $entityManager->persist($servico);
     $entityManager->flush();        
     
-    $avaliacaoCliente = new AvaliacaoCliente($servico->getSolicitacao()->getUsuario(), $servico, $request->getParam('desisteAdiaCancelaServico'), $request->getParam('pagaCombinado'),$request->getParam('exigeAlemCombinado'));
+    $avaliacaoCliente = new AvaliacaoCliente($servico->getSolicitacao()->getUsuario(), $servico, $request->getParam('desisteAdiaCancelaServico'), $request->getParam('pagaCombinado'),$request->getParam('exigeAlemCombinado'),$request->getParam('comentario'));
     $entityManager->persist($avaliacaoCliente);
     $entityManager->flush(); 
 
