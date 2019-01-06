@@ -246,15 +246,6 @@ $app->post('/api/cadastro/profissional', function (Request $request, Response $r
         ->withHeader('Content-type', 'application/json');
     return $return;
     }
-
-    $userBanco = $usersRepository->findOneBy(array('cnpj' => $profissional->getCnpj()));
-    
-    if($userBanco != null){
-        $return = $response->withJson(['mensagem'=>"Já existe um profissional cadastrado para esse CNPJ."], 409)
-        ->withHeader('Content-type', 'application/json');
-    return $return;
-    }
-
     /**
      * Persiste a entidade no banco de dados
      */
@@ -914,12 +905,39 @@ $app->get('/api/consulta/favoritos/{id}', function (Request $request, Response $
     foreach ($solicitacoes as $solicitacao){
         if($solicitacao->getOrcamento1()!= null){
             if($solicitacao->getOrcamento1()->getStatus()->getId()==6){
-            $favoritos[] = $solicitacao->getOrcamento1()->getProfissional();
+            $profissional = $solicitacao->getOrcamento1()->getProfissional();    
+              
+            $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional'=>$profissional));
+            $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findBy(array('orcamento'=>$orcamentos));
+            $somatorio = 0;
+            $divisor = 0;
+            $media = 0;
+            foreach ($avaliacoes as $avaliacao){
+                $somatorio = $somatorio + $avaliacao->getPontualidade() + $avaliacao->getCompetencia() + $avaliacao->getPrazo() + $avaliacao->getOrganizacao() + $avaliacao->getAtitude();
+                $divisor=$divisor+5;
+            }
+            $media = $somatorio/$divisor;
+            if($media >= $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"nota_minima"))){
+                $favoritos[] = $profissional;
+            }
             continue;
             }
         } elseif($solicitacao->getOrcamento2()!= null){
             if($solicitacao->getOrcamento2()->getStatus()->getId()==6){
-            $favoritos[] = $solicitacao->getOrcamento2()->getProfissional();
+                $profissional = $solicitacao->getOrcamento2()->getProfissional();
+                $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional'=>$profissional));
+                $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findBy(array('orcamento'=>$orcamentos));
+                $somatorio = 0;
+                $divisor = 0;
+                $media = 0;
+                foreach ($avaliacoes as $avaliacao){
+                    $somatorio = $somatorio + $avaliacao->getPontualidade() + $avaliacao->getCompetencia() + $avaliacao->getPrazo() + $avaliacao->getOrganizacao() + $avaliacao->getAtitude();
+                    $divisor=$divisor+5;
+                }
+                $media = $somatorio/$divisor;
+                if($media >= $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"nota_minima"))){
+                    $favoritos[] = $profissional;
+                }
             continue;
             }
         }
