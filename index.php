@@ -723,26 +723,26 @@ $app->get('/api/consulta/solicitacao/{tipoUsuario}/{idUsuario}/{status}', functi
         $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
         $usuario = $usersRepository->find($idUsuario);
         if($status == "T"){
-            $solicitacoes = $repository->findBy(array('usuario' => $usuario)); 
+            $solicitacoes = $repository->findBy(array('usuario' => $usuario), array('id' => 'DESC')); 
         } else{
-            $solicitacoes = $repository->findBy(array('usuario' => $usuario, 'status' => $status));
+            $solicitacoes = $repository->findBy(array('usuario' => $usuario, 'status' => $status), array('id' => 'DESC'));
         }
     }elseif($tipoUsuario == "profissional"){
         $profissionalRepository = $entityManager->getRepository('App\Models\Entity\Profissional'); 
         $profissional = $profissionalRepository->find($idUsuario);
         if($status == "T"){
-        $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal()));
+        $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal()), array('id' => 'DESC'));
         if($profissional->getAtividade_Extra() != null){
-            $solicitacoes_extra = $repository->findBy(array('atividade' => $profissional->getAtividade_Extra()));
+            $solicitacoes_extra = $repository->findBy(array('atividade' => $profissional->getAtividade_Extra()), array('id' => 'DESC'));
             $result = array_merge($solicitacoes, $solicitacoes_extra);
             $solicitacoes = $result;
         }
         } else{
-            $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => $status));
+            $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => $status), array('id' => 'DESC'));
             if($profissional->getAtividade_Extra() != null){
-                $solicitacoes_extra = $repository->findBy(array('atividade' => $profissional->getAtividade_Extra(), 'status' => $status));
+                $solicitacoes_extra = $repository->findBy(array('atividade' => $profissional->getAtividade_Extra(), 'status' => $status), array('id' => 'DESC'));
                 $result = array_merge($solicitacoes, $solicitacoes_extra);
-                $solicitacoes = $result;
+                $solicitacoes = $result; 
             }
         }
     }
@@ -758,7 +758,7 @@ $app->put('/api/cancelar/solicitacao/{id}', function (Request $request, Response
     $id = $route->getArgument('id');
     $solicitacao = $entityManager->getRepository('App\Models\Entity\SolicitacaoOrcamento')->find($id);
     
-    $solicitacao->setStatus("F");
+    $solicitacao->setStatus("C");
 
     $entityManager->persist($solicitacao);
     $entityManager->flush();        
@@ -786,7 +786,6 @@ $app->post('/api/gravar/orcamento', function (Request $request, Response $respon
         $solicitacao->setOrcamento1($orcamento);
     } else{
         $solicitacao->setOrcamento2($orcamento);
-        $solicitacao->setStatus("F");
     }
     $entityManager->persist($solicitacao);
     $entityManager->flush();
@@ -825,6 +824,9 @@ $app->post('/api/gravar/avaliacao/profissional', function (Request $request, Res
     $entityManager->persist($orcamento);
     $entityManager->flush();
 
+    $solicitacao = $orcamento->getSolicitacao();
+    $solicitacao->$solicitacao->setStatus("F");
+
     $return = $response->withJson($avaliacao, 201)
         ->withHeader('Content-type', 'application/json');
             return $return;
@@ -860,7 +862,7 @@ try {
     $senha = $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"senha_email"));
     $mail->Password = $senha;                             // SMTP password
     $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-    $mail->Port = 587;                                    // TCP port to connect to 587
+    $mail->Port = 587;                                   // TCP port to connect to 587
 
     //Recipients
     $mail->setFrom('contato@indicaerecomenda.com.br', '');
