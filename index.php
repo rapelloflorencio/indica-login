@@ -162,7 +162,7 @@ $app->post('/api/cadastro/usuario', function (Request $request, Response $respon
     $bairroRepository = $entityManager->getRepository('App\Models\Entity\Bairro');
     $bairro = $bairroRepository->find($id);        
 
-    $user = new Usuario($params->nome,$params->password,$params->cep,$params->endereco,$params->complemento,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->cpf,$params->imagem, $perfil);
+    $user = new Usuario($params->nome,$params->password,$params->cep,$params->endereco,$params->complemento,$bairro,$params->email,$params->telefone1,$params->telefone2,$params->cpf,$params->imagem, $perfil, $params->situacao_cadastral);
     
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
     $userBanco = $usersRepository->findOneBy(array('email' => $user->getEmail()));
@@ -294,7 +294,8 @@ $app->put('/api/usuario/{id}', function (Request $request, Response $response) u
         ->setTelefone2($request->getParam('telefone2'))
         ->setCpf($request->getParam('cpf'))
         ->setImagem($request->getParam('imagem'))
-        ->setPerfil($perfil);
+        ->setPerfil($perfil)
+        ->setSituacao_Cadastral($request->getParam('situacao_cadastral'));
 
     /**
      * Persiste a entidade no banco de dados
@@ -307,6 +308,35 @@ $app->put('/api/usuario/{id}', function (Request $request, Response $response) u
         ->withHeader('Content-type', 'application/json');
     return $return;
 });
+
+$app->put('/api/atualiza/situacaoCadastral/usuario/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    /**
+     * Pega o ID do Usuario informado na URL
+     */
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('id');
+
+    /**
+     * Encontra o Usuario no Banco
+     */ 
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+    $user = $usersRepository->find($id);   
+
+    $user->setSituacao_Cadastral($request->getParam('situacao_cadastral'));
+
+    /**
+     * Persiste a entidade no banco de dados
+     */
+    $entityManager->persist($user);
+    $entityManager->flush();        
+
+    
+    $return = $response->withJson($user, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
 
 $app->put('/api/profissional/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
 
@@ -377,6 +407,33 @@ $app->put('/api/profissional/{id}', function (Request $request, Response $respon
     return $return;
 });
 
+$app->put('/api/atualiza/situacaoCadastral/profissional/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    /**
+     * Pega o ID do Usuario informado na URL
+     */
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('id');
+
+    /**
+     * Encontra o Usuario no Banco
+     */ 
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+    $user = $usersRepository->find($id);   
+
+    $user->setSituacao_Cadastral($request->getParam('situacao_cadastral'));
+       
+    /**
+     * Persiste a entidade no banco de dados
+     */
+    $entityManager->persist($user);
+    $entityManager->flush();        
+
+    
+    $return = $response->withJson($user, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
 
 $app->put('/api/alterarSenha/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
 
@@ -844,16 +901,16 @@ $app->post('/api/enviar/email', function (Request $request, Response $response) 
     $params = (object) $request->getParams();
     $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
 try {
-    //Server settings
-    $mail->SMTPDebug = 3;                                 // Enable verbose debug output
-    $mail->isSMTP();                                      // Set mailer to use SMTP
-    $mail->Host = 'mail.indicaerecomenda.com.br';         // Specify main and backup SMTP servers
-    $mail->SMTPAuth = true;                               // Enable SMTP authentication
-    $mail->Username = 'contato@indicaerecomenda.com.br'; // SMTP username
-    $senha = $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"senha_email"));
-    $mail->Password = $senha;                             // SMTP password
-    $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-    $mail->Port = 587;                                   // TCP port to connect to 587
+   //Server settings
+   $mail->SMTPDebug = 3;                                 // Enable verbose debug output
+   //$mail->isSMTP();                                      // Set mailer to use SMTP
+   $mail->Host = 'mail.indicaerecomenda.com.br';         // Specify main and backup SMTP servers
+   $mail->SMTPAuth = false;                               // Enable SMTP authentication
+   $mail->Username = 'contato@indicaerecomenda.com.br'; // SMTP username
+   $senha = $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"senha_email"));
+   $mail->Password = $senha;                             // SMTP password
+   //$mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+   $mail->Port = 25;                                   // TCP port to connect to 587
 
     //Recipients
     $mail->setFrom('contato@indicaerecomenda.com.br', '');
@@ -1013,6 +1070,11 @@ $app->post('/api/gravar/inicio/servico', function (Request $request, Response $r
     $entityManager->persist($servico);
     $entityManager->flush();
     
+    $solicitacao->setServico($servico);
+
+    $entityManager->persist($solicitacao);
+    $entityManager->flush();
+
     $return = $response->withJson($servico, 201)
         ->withHeader('Content-type', 'application/json');
             return $return;

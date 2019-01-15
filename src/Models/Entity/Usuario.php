@@ -112,8 +112,15 @@ class Usuario implements \JsonSerializable
      * @ORM\ManyToOne(targetEntity="App\Models\Entity\Perfil")
      */
      private $perfil;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string")
+     */
+    private $situacao_cadastral;
    
-    public function __construct(string $nome, string $password, string $cep, string $endereco, string $complemento, ?Bairro $bairro, string $email, string $telefone1, string $telefone2, string $cpf, string $imagem, ?Perfil $perfil)
+    public function __construct(string $nome, string $password, string $cep, string $endereco, string $complemento, ?Bairro $bairro, string $email, string $telefone1, string $telefone2, string $cpf, string $imagem, ?Perfil $perfil, $situacao_cadastral)
     {
         $this->nome = $nome;
         $this->password = password_hash($password, PASSWORD_BCRYPT);
@@ -128,6 +135,7 @@ class Usuario implements \JsonSerializable
         $this->cpf = $cpf;
         $this->imagem = $imagem;
         $this->perfil = $perfil;
+        $this->situacao_cadastral = $situacao_cadastral;
     }
 
     public function getId(): int
@@ -262,6 +270,15 @@ class Usuario implements \JsonSerializable
         return $this;
     }
 
+    public function getSituacao_Cadastral(): string
+    {
+        return $this->situacao_cadastral;
+    }
+
+    public function setSituacao_Cadastral($situacao_cadastral){
+        $this->situacao_cadastral = $situacao_cadastral;
+        return $this;  
+    }
 
     /**
      * {@inheritdoc}
@@ -281,7 +298,8 @@ class Usuario implements \JsonSerializable
             'telefone1' =>    $this->getTelefone1(),
             'telefone2' =>   $this->getTelefone2(),
             'cpf' =>   $this->getCpf(),
-            'perfil' => $this->getPerfil()
+            'perfil' => $this->getPerfil(),
+            'situacao_cadastral' => $this->getSituacao_Cadastral()
         ];
     }
 }

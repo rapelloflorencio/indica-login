@@ -14,6 +14,7 @@ use App\Models\Entity\Orcamento;
 use App\Models\Entity\LocalAtendimento;
 use App\Models\Entity\UrgenciaServico;
 use App\Models\Entity\Profissional;
+use App\Models\Entity\Servico;
 
 /**
  * The User class demonstrates how to annotate a simple
@@ -123,6 +124,11 @@ class SolicitacaoOrcamento implements \JsonSerializable
      * @ORM\ManyToOne(targetEntity="App\Models\Entity\Profissional")
      */
     private $favorito;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Models\Entity\Servico")
+     */
+    private $servico;
 
     public function __construct(?Usuario $usuario, ?AtividadeProfissional $atividade, ?Bairro $bairro, string $textoSolicitacao, ?UrgenciaServico $urgenciaServico,?LocalAtendimento $localAtendimento,?HorarioServico $horario, string $endereco, ?HorarioServico $horarioAlternativo, string $dataServico, string $dataAlternativa, ?Profissional $favorito)
     {
@@ -299,6 +305,16 @@ class SolicitacaoOrcamento implements \JsonSerializable
         return $this;  
     }
 
+    public function getservico(): ?Servico
+    {
+        return $this->servico;
+    }
+
+    public function setServico($servico){
+        $this->servico = $servico;
+        return $this;  
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -320,7 +336,9 @@ class SolicitacaoOrcamento implements \JsonSerializable
             'orcamento1' => $this->getOrcamento1(),
             'orcamento2' => $this->getOrcamento2(),
             'status' => $this->getStatus(),
-            'favorito' => $this->getFavorito()
+            'favorito' => $this->getFavorito(),
+            'statusS
+            ervico' => $this->getServico()->getStatus()
         ];
     }
 }
