@@ -8,6 +8,7 @@ use PHPMailer\PHPMailer\Exception;
 use App\Models\Entity\Usuario;
 use App\Models\Entity\Perfil;
 use App\Models\Entity\Profissional;
+use App\Models\Entity\Administrador;
 use App\Models\Entity\AtividadeProfissional;
 use App\Models\Entity\Bairro;
 use App\Models\Entity\HorarioServico;
@@ -507,6 +508,8 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
             $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
         }elseif($params->perfil == "profissional"){
             $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+        }elseif($params->perfil == "admin"){
+            $usersRepository = $entityManager->getRepository('App\Models\Entity\Administrador');
         }
         $userBanco = $usersRepository->findOneBy(array('email' => $params->email));
       
@@ -595,12 +598,30 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
         $app->post('/api/atividade', function (Request $request, Response $response) use ($app,$entityManager) {
         
             $params = (object) $request->getParams();
-            $atividade = new AtividadeProfissional($params->nome);
+            $atividade = new AtividadeProfissional($params->nome, $params->mneumonico);
             
             $entityManager->persist($atividade);
             $entityManager->flush();
                
             $return = $response->withJson($atividade, 201)
+                ->withHeader('Content-type', 'application/json');
+            return $return;
+        });
+        
+        $app->put('/api/atualiza/atividade/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+                
+            $route = $request->getAttribute('route');
+            $id = $route->getArgument('id');
+        
+            $atividade = $entityManager->getRepository('App\Models\Entity\AtividadeProfissional')->find($id);
+            
+            $atividade->setNome($request->getParam('nome'));
+            $atividade->setMneumonico($request->getParam('mneumonico'));
+        
+            $entityManager->persist($atividade);
+            $entityManager->flush();        
+               
+            $return = $response->withJson($atividade, 200)
                 ->withHeader('Content-type', 'application/json');
             return $return;
         });
@@ -1121,4 +1142,28 @@ $app->get('/api/consulta/servico/por/orcamento/{id_orcamento}', function (Reques
         ->withHeader('Content-type', 'application/json');
     return $return;
 });
+
+$app->post('/api/cadastro/administrador', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    $params = (object) $request->getParams();
+    
+    $id = $params->perfil;
+    $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
+    $perfil = $perfilRepository->find($id);        
+    
+    $user = new Administrador($params->nome,$params->password, $params->email,$params->telefone, $perfil);
+    
+    /**
+     * Persiste a entidade no banco de dados
+     */
+    $entityManager->persist($user);
+    $entityManager->flush();
+
+
+    $return = $response->withJson($user, 201)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+
 $app->run();
