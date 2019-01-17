@@ -12,7 +12,7 @@ use App\Models\Entity\Perfil;
  * PHP class to act as a Doctrine entity.
  *
  * @ORM\Entity()
- * @ORM\Table(name="profissionais")
+ * @ORM\Table(name="administrador")
  */
 class Administrador implements \JsonSerializable
 {
