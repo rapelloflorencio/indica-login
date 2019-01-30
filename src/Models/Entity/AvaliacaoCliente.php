@@ -24,7 +24,7 @@ class AvaliacaoCliente implements \JsonSerializable
     private $id;
 
      /**
-     * @ORM\OneToOne(targetEntity="App\Models\Entity\Usuario")
+     * @ORM\ManyToOne(targetEntity="App\Models\Entity\Usuario")
      */
     private $usuario;
 

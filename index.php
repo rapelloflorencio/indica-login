@@ -20,6 +20,7 @@ use App\Models\Entity\UrgenciaServico;
 use App\Models\Entity\AvaliacaoServico;
 use App\Models\Entity\AvaliacaoCliente;
 use App\Models\Entity\Servico;
+use App\Models\Entity\Pagamento;
 use App\Models\Entity\Parametro;
 use Slim\App;
 use Slim\Container;
@@ -869,6 +870,12 @@ $app->post('/api/gravar/orcamento', function (Request $request, Response $respon
     $entityManager->persist($solicitacao);
     $entityManager->flush();
     
+
+    $valor = (int) str_replace(",","",$entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"valor_aceite_orcamento")));
+    $pagamento = new Pagamento(null,$orcamento, $profissional,"Débito", $valor);
+    $entityManager->persist($pagamento);
+    $entityManager->flush();
+
     $return = $response->withJson($orcamento, 201)
         ->withHeader('Content-type', 'application/json');
             return $return;
@@ -1137,6 +1144,10 @@ $app->put('/api/gravar/final/servico/{id}', function (Request $request, Response
     $entityManager->persist($avaliacaoCliente);
     $entityManager->flush(); 
 
+    $pagamento = new Pagamento($servico,null, $servico->getOrcamento()->getProfissional(),"Débito", $servico->getValorDevidoAjustado());
+    $entityManager->persist($pagamento);
+    $entityManager->flush();
+
     $return = $response->withJson(['servico'=>$servico, 'avaliacaoCliente'=>$avaliacaoCliente], 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
@@ -1175,6 +1186,29 @@ $app->get('/api/consulta/servico/status/{status}/{mes}/{ano}', function (Request
     $servicos = $qb->getQuery()->getResult();        
 
     $return = $response->withJson($servicos, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+$app->get('/api/consulta/pagamento/status/{status}/{mes}/{ano}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    $status = $route->getArgument('status');
+    $repository = $entityManager->getRepository('App\Models\Entity\Pagamento');
+    
+    $mes = $route->getArgument('mes');
+    $ano = $route->getArgument('ano');
+    
+    $startDate = new \DateTimeImmutable("$ano-$mes-01T00:00:00");
+    $endDate = $startDate->modify('last day of this month')->setTime(23, 59, 59);
+
+    $qb = $repository->createQueryBuilder('pagamento');
+    $qb->where('pagamento.dataInclusao BETWEEN :start AND :end');
+    $qb->setParameter('start', $startDate);
+    $qb->setParameter('end', $endDate);
+
+    $pagamentos = $qb->getQuery()->getResult();        
+
+    $return = $response->withJson($pagamentos, 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
 });

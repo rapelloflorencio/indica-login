@@ -84,7 +84,7 @@ class Pagamento implements \JsonSerializable
         $this->dataInclusao = new \DateTimeImmutable('now');
         $this->dataEnvio = null;
         $this->valor = $valor;
-        $this->status = "A";
+        $this->status = "ativo";
     }
     
 
