@@ -92,7 +92,7 @@ class AvaliacaoServico implements \JsonSerializable
     public function __construct(?Orcamento $orcamento, string $dataTermino, int $valor, int $pontualidade,int $competencia, int $prazo, int $organizacao, int $atitude, string $comentario)
     {
         $this->orcamento = $orcamento;
-        $this->dataTermino = new \DateTimeImmutable($dataTermino);;
+        $this->dataTermino = new \DateTimeImmutable($dataTermino);
         $this->valor = $valor;
         $this->pontualidade = $pontualidade;
         $this->competencia = $competencia;
@@ -205,7 +205,8 @@ class AvaliacaoServico implements \JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'orcamento' => $this->getOrcamento(),
+            'usuario' => $this->getOrcamento()->getSolicitacao()->getUsuario()->getNome(),
+            'profissional' => $this->getOrcamento()->getProfissional()->getNome(),
             'valor' => $this->getValor(),
             'pontualidade' => $this->getPontualidade(),
             'prazo' => $this->getPrazo(),
@@ -213,7 +214,7 @@ class AvaliacaoServico implements \JsonSerializable
             'atitude' => $this->getAtitude(),
             'competencia' => $this->getCompetencia(),
             'comentario' => $this->getComentario(),
-            'atividade' => $this->getAtividade()
+            'atividade' => $this->getAtividade()->getNome()
         ];
     }
 }

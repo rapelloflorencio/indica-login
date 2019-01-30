@@ -320,6 +320,29 @@ class SolicitacaoOrcamento implements \JsonSerializable
      */
     public function jsonSerialize()
     {
+    if($this->getServico() == null){
+    
+    	 return [
+            'id' => $this->getId(),
+            'usuario' => $this->getUsuario(),
+            'atividade' => $this->getAtividade(),
+            'bairro' => $this->getBairro(),
+            'textoSolicitacao' => $this->getTextoSolicitacao(),
+            'urgenciaServico' => $this->getUrgenciaServico(),
+            'localAtendimento' => $this->getLocalAtendimento(),
+            'dataServico' => $this->getDataServico(),
+            'horario' => $this->getHorario(),
+            'dataAlternativa' => $this->getDataAlternativa(),
+            'horarioAlternativo' => $this->getHorarioAlternativo(),
+            'dataSolicitacao' => $this->getDataSolicitacao(),
+            'orcamento1' => $this->getOrcamento1(),
+            'orcamento2' => $this->getOrcamento2(),
+            'status' => $this->getStatus(),
+            'favorito' => $this->getFavorito(),
+            'statusServico' => ""
+        ];
+    	}
+    
         return [
             'id' => $this->getId(),
             'usuario' => $this->getUsuario(),
@@ -337,8 +360,7 @@ class SolicitacaoOrcamento implements \JsonSerializable
             'orcamento2' => $this->getOrcamento2(),
             'status' => $this->getStatus(),
             'favorito' => $this->getFavorito(),
-            'statusS
-            ervico' => $this->getServico()->getStatus()
+            'statusServico' => $this->getServico()->getStatus()
         ];
     }
 }

@@ -128,6 +128,7 @@ class Servico implements \JsonSerializable
         $this->prazoInicial = $prazoInicial;
         $this->status = "A";
     }
+    
 
     public function getId(): int
     {

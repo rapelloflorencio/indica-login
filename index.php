@@ -122,6 +122,16 @@ $app->get('/api/profissional/{id}', function (Request $request, Response $respon
     return $return;
 });
 
+$app->get('/api/profissional/situacaoCadastral/{situacao}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    $situacao_cadastral = $route->getArgument('situacao');
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+    $users = $usersRepository->findBy(array('situacao_cadastral' => $situacao_cadastral));
+
+    $return = $response->withJson($users, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
 
 /**
  * Lista de todos os usuarios
@@ -894,7 +904,10 @@ $app->post('/api/gravar/avaliacao/profissional', function (Request $request, Res
     $entityManager->flush();
 
     $solicitacao = $orcamento->getSolicitacao();
-    $solicitacao->$solicitacao->setStatus("F");
+    $solicitacao->setStatus("F");
+    
+    $entityManager->persist($solicitacao);
+    $entityManager->flush();
 
     $return = $response->withJson($avaliacao, 201)
         ->withHeader('Content-type', 'application/json');
@@ -1142,6 +1155,30 @@ $app->get('/api/consulta/servico/por/orcamento/{id_orcamento}', function (Reques
         ->withHeader('Content-type', 'application/json');
     return $return;
 });
+
+$app->get('/api/consulta/servico/status/{status}/{mes}/{ano}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    $status = $route->getArgument('status');
+    $repository = $entityManager->getRepository('App\Models\Entity\Servico');
+    
+    $mes = $route->getArgument('mes');
+    $ano = $route->getArgument('ano');
+    
+    $startDate = new \DateTimeImmutable("$ano-$mes-01T00:00:00");
+    $endDate = $startDate->modify('last day of this month')->setTime(23, 59, 59);
+
+    $qb = $repository->createQueryBuilder('servico');
+    $qb->where('servico.dataTermino BETWEEN :start AND :end');
+    $qb->setParameter('start', $startDate);
+    $qb->setParameter('end', $endDate);
+
+    $servicos = $qb->getQuery()->getResult();        
+
+    $return = $response->withJson($servicos, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
 
 $app->post('/api/cadastro/administrador', function (Request $request, Response $response) use ($app,$entityManager) {
 
