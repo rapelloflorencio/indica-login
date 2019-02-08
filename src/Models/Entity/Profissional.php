@@ -185,6 +185,20 @@ class Profissional implements \JsonSerializable
      */
     private $identidade;
 
+    /**
+     * @var \DateTimeImmutable
+     *
+     * @ORM\Column(type="datetimetz_immutable", nullable=false, , name="data_aceite")
+     */
+    private $dataAceite;
+    
+     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=true, name="status_aceite")
+     */
+    private $statusAceite;
+
     public function __construct(string $nome, string $nome_fantasia, string $password, string $cep, string $endereco, string $complemento, ?Bairro $bairro, string $email, string $telefone1, string $telefone2,string $telefone3, string $telefone4, string $cpf, string $cnpj, string $frenterg, string $versorg, string $comprovante, string $imagem, ?AtividadeProfissional $atividade_principal, ?AtividadeProfissional $atividade_extra, string $situacao_cadastral, ?Perfil $perfil, string $identidade)
     {
         $this->nome = $nome;
@@ -342,6 +356,19 @@ class Profissional implements \JsonSerializable
         return $this->imagem;
     }
 
+    public function getStatusAceite(): string
+    {
+        return $this->statusAceite;
+    }
+
+    public function getDataAceite(): \DateTimeImmutable
+    {
+        if($this->dataAceite == null){
+            return new \DateTimeImmutable("9999-01-01");
+        }
+        return $this->dataAceite;
+    }
+
     public function setNome($nome){
         $this->nome = $nome;
         return $this;  
@@ -349,6 +376,11 @@ class Profissional implements \JsonSerializable
 
     public function setIdentidade($identidade){
         $this->identidade = $identidade;
+        return $this;  
+    }
+    
+    public function setStatusAceite($statusAceite){
+        $this->statusAceite = $statusAceite;
         return $this;  
     }
 
@@ -463,6 +495,12 @@ class Profissional implements \JsonSerializable
         $this->imagem = $imagem;
         return $this;  
     }
+
+    public function setDataAceite($dataAceite){
+        $this->dataAceite = new \DateTimeImmutable($dataAceite);
+        return $this;  
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -489,7 +527,9 @@ class Profissional implements \JsonSerializable
             'atividade_extra' => $this->getAtividade_Extra(),
             'situacao_cadastral' => $this->getSituacao_Cadastral(),
             'perfil' => $this->getPerfil(),
-            'identidade' => $this->getIdentidade()
+            'identidade' => $this->getIdentidade(),
+            'dataAceite' => $this->getDataAceite(),
+            'statusAceite' => $this->getStatusAceite()
         ];
     }
 }

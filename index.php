@@ -292,6 +292,14 @@ $app->put('/api/usuario/{id}', function (Request $request, Response $response) u
 
     $perfilRepository = $entityManager->getRepository('App\Models\Entity\Perfil');
     $perfil = $perfilRepository->find($request->getParam('perfil'));
+    
+    $userBanco = $usersRepository->findOneBy(array('cpf' => $request->getParam('cpf')));
+    if($userBanco!=null){
+	  $return = $response->withJson(['mensagem'=>"Já existe um usuário cadastrado para este CPF."], 409)
+        ->withHeader('Content-type', 'application/json');
+    	return $return;  
+    }
+    
     /**
      * Atualiza e Persiste o Usuario com os parâmetros recebidos no request
      */
@@ -871,7 +879,7 @@ $app->post('/api/gravar/orcamento', function (Request $request, Response $respon
     $entityManager->flush();
     
 
-    $valor = (int) str_replace(",","",$entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"valor_aceite_orcamento")));
+    $valor = (int) str_replace(",","",$entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"valor_aceite_orcamento"))->getValor());
     $pagamento = new Pagamento(null,$orcamento, $profissional,"Débito", $valor);
     $entityManager->persist($pagamento);
     $entityManager->flush();
@@ -948,7 +956,7 @@ try {
    $mail->Host = 'mail.indicaerecomenda.com.br';         // Specify main and backup SMTP servers
    $mail->SMTPAuth = false;                               // Enable SMTP authentication
    $mail->Username = 'contato@indicaerecomenda.com.br'; // SMTP username
-   $senha = $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"senha_email"));
+   $senha = $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"senha_email"))->getValor();
    $mail->Password = $senha;                             // SMTP password
    //$mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
    $mail->Port = 25;                                   // TCP port to connect to 587
