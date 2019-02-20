@@ -188,7 +188,7 @@ class Profissional implements \JsonSerializable
     /**
      * @var \DateTimeImmutable
      *
-     * @ORM\Column(type="datetimetz_immutable", nullable=false, , name="data_aceite")
+     * @ORM\Column(type="datetimetz_immutable", nullable=true, name="data_aceite")
      */
     private $dataAceite;
     

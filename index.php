@@ -127,12 +127,44 @@ $app->get('/api/profissional/situacaoCadastral/{situacao}', function (Request $r
     $route = $request->getAttribute('route');
     $situacao_cadastral = $route->getArgument('situacao');
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+    
+    if($situacao_cadastral=="T"){
+    	$users = $usersRepository->findAll();
+
+    $return = $response->withJson($users, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+    }else{
+    
     $users = $usersRepository->findBy(array('situacao_cadastral' => $situacao_cadastral));
 
     $return = $response->withJson($users, 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
+    }
 });
+
+$app->get('/api/usuario/situacaoCadastral/{situacao}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    $situacao_cadastral = $route->getArgument('situacao');
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
+    
+    if($situacao_cadastral=="T"){
+    	$users = $usersRepository->findAll();
+
+    $return = $response->withJson($users, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+    }else{
+    
+    $users = $usersRepository->findBy(array('situacao_cadastral' => $situacao_cadastral));
+
+    $return = $response->withJson($users, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+    }
+});
+
 
 /**
  * Lista de todos os usuarios
@@ -941,6 +973,26 @@ $app->get('/api/consulta/avaliacao/profissional/{id_atividade}', function (Reque
     $route = $request->getAttribute('route');
     
     $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findBy(array('atividade' => $route->getArgument('id_atividade')));
+    $return = $response->withJson($avaliacoes, 200)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+});
+
+$app->get('/api/profissional/avaliacoes/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    
+    $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional' => $route->getArgument('id')));
+    
+    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findBy(array('orcamento' => $orcamentos));
+    $return = $response->withJson($avaliacoes, 200)
+        ->withHeader('Content-type', 'application/json');
+            return $return;
+});
+
+$app->get('/api/usuario/avaliacoes/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+        
+    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoCliente')->findBy(array('usuario' => $route->getArgument('id')));
     $return = $response->withJson($avaliacoes, 200)
         ->withHeader('Content-type', 'application/json');
             return $return;
