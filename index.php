@@ -487,6 +487,36 @@ $app->put('/api/atualiza/situacaoCadastral/profissional/{id}', function (Request
     return $return;
 });
 
+$app->put('/api/atualiza/aceite/profissional/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    /**
+     * Pega o ID do Usuario informado na URL
+     */
+    $route = $request->getAttribute('route');
+    $id = $route->getArgument('id');
+
+    /**
+     * Encontra o Usuario no Banco
+     */ 
+    $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
+    $user = $usersRepository->find($id);   
+
+    $user->setStatusAceite($request->getParam('aceite'));
+    $user->setStatusAceite($request->getParam('data'));
+       
+    /**
+     * Persiste a entidade no banco de dados
+     */
+    $entityManager->persist($user);
+    $entityManager->flush();        
+
+    
+    $return = $response->withJson($user, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+
 $app->put('/api/alterarSenha/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
 
     /**
