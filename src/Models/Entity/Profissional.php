@@ -358,6 +358,9 @@ class Profissional implements \JsonSerializable
 
     public function getStatusAceite(): string
     {
+        if($this->statusAceite == null){
+            return "";
+        }
         return $this->statusAceite;
     }
 

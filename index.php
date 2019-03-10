@@ -127,42 +127,111 @@ $app->get('/api/profissional/situacaoCadastral/{situacao}', function (Request $r
     $route = $request->getAttribute('route');
     $situacao_cadastral = $route->getArgument('situacao');
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Profissional');
-    
+    $users = null;
     if($situacao_cadastral=="T"){
     	$users = $usersRepository->findAll();
-
-    $return = $response->withJson($users, 200)
-        ->withHeader('Content-type', 'application/json');
-    return $return;
     }else{
-    
-    $users = $usersRepository->findBy(array('situacao_cadastral' => $situacao_cadastral));
-
-    $return = $response->withJson($users, 200)
+        $users = $usersRepository->findBy(array('situacao_cadastral' => $situacao_cadastral));
+    }
+    $resultados = array();
+    foreach($users as $user){
+    $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional'=>$user->getId()));
+    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findBy(array('orcamento'=>$orcamentos));
+    $somatorio = 0;
+    $divisor = 0;
+    $media = 0;
+    foreach ($avaliacoes as $avaliacao){
+        $somatorio = $somatorio + $avaliacao->getPontualidade() + $avaliacao->getCompetencia() + $avaliacao->getPrazo() + $avaliacao->getOrganizacao() + $avaliacao->getAtitude();
+        $divisor=$divisor+5;
+    }
+    $nota = 0;
+    if($divisor != 0){
+    $media = $somatorio/$divisor;
+    $nota = number_format($media,1,',','');
+    }
+    $resultado = [
+            'id' => $user->getId(),
+            'nome' => $user->getNome(),
+            'nome_fantasia' => $user->getNome_Fantasia(),
+            'registered_at' => $user->getRegisteredAt()
+                ->format(\DateTime::ATOM),
+            'cep' => $user->getCep(),
+            'endereco' =>   $user->getEndereco(),
+            'complemento' => $user->getComplemento(),
+            'bairro' =>   $user->getBairro(),
+            'email' =>   $user->getEmail(),
+            'telefone1' =>    $user->getTelefone1(),
+            'telefone2' =>   $user->getTelefone2(),
+            'telefone3' =>    $user->getTelefone3(),
+            'telefone4' =>   $user->getTelefone4(),
+            'cpf' =>   $user->getCpf(),
+            'cnpj' =>   $user->getCnpj(),
+            'atividade_principal' => $user->getAtividade_Principal(),
+            'atividade_extra' => $user->getAtividade_Extra(),
+            'situacao_cadastral' => $user->getSituacao_Cadastral(),
+            'perfil' => $user->getPerfil(),
+            'identidade' => $user->getIdentidade(),
+            'dataAceite' => $user->getDataAceite(),
+            'statusAceite' => $user->getStatusAceite(),
+            'nota' => $nota
+        ];
+        $resultados[] = $resultado;
+    }
+    $return = $response->withJson($resultados, 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
-    }
+
 });
 
 $app->get('/api/usuario/situacaoCadastral/{situacao}', function (Request $request, Response $response) use ($app,$entityManager) {
     $route = $request->getAttribute('route');
     $situacao_cadastral = $route->getArgument('situacao');
     $usersRepository = $entityManager->getRepository('App\Models\Entity\Usuario');
-    
+    $users = null;
     if($situacao_cadastral=="T"){
     	$users = $usersRepository->findAll();
 
-    $return = $response->withJson($users, 200)
-        ->withHeader('Content-type', 'application/json');
-    return $return;
     }else{
+         $users = $usersRepository->findBy(array('situacao_cadastral' => $situacao_cadastral));
+    }
+    $resultados = array();
+    foreach($users as $user){
+    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoCliente')->findBy(array('usuario'=>$user->getid()));
+    $somatorio = 0;
+    $divisor = 0;
+    $media = 0;
+    foreach ($avaliacoes as $avaliacao){
+        $somatorio = $somatorio + $avaliacao->getDesisteAdiaCancelaServico() + $avaliacao->getPagaCombinado() + $avaliacao->getExigeAlemCombinado();
+        $divisor=$divisor+3;
+    }
+    $nota = 0;
+    if($divisor != 0){
+    $media = $somatorio/$divisor;
+    $nota = number_format($media,1,',','');
+    }
+    $resultado = [
+            'id' => $user->getId(),
+            'nome' => $user->getNome(),
+            'registered_at' => $user->getRegisteredAt()
+                ->format(\DateTime::ATOM),
+            'cep' => $user->getCep(),
+            'endereco' =>   $user->getEndereco(),
+            'complemento' => $user->getComplemento(),
+            'bairro' =>   $user->getBairro(),
+            'email' =>   $user->getEmail(),
+            'telefone1' =>    $user->getTelefone1(),
+            'telefone2' =>   $user->getTelefone2(),
+            'cpf' =>   $user->getCpf(),
+            'perfil' => $user->getPerfil(),
+            'situacao_cadastral' => $user->getSituacao_Cadastral(),
+            'nota' => $nota
+        ];
+        $resultados[] = $resultado;
+    }
     
-    $users = $usersRepository->findBy(array('situacao_cadastral' => $situacao_cadastral));
-
-    $return = $response->withJson($users, 200)
+    $return = $response->withJson($resultados, 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
-    }
 });
 
 
@@ -326,7 +395,7 @@ $app->put('/api/usuario/{id}', function (Request $request, Response $response) u
     $perfil = $perfilRepository->find($request->getParam('perfil'));
     
     $userBanco = $usersRepository->findOneBy(array('cpf' => $request->getParam('cpf')));
-    if($userBanco!=null){
+    if($userBanco!=null &&  $userBanco->getId()!=$id){
 	  $return = $response->withJson(['mensagem'=>"Já existe um usuário cadastrado para este CPF."], 409)
         ->withHeader('Content-type', 'application/json');
     	return $return;  
@@ -336,7 +405,6 @@ $app->put('/api/usuario/{id}', function (Request $request, Response $response) u
      * Atualiza e Persiste o Usuario com os parâmetros recebidos no request
      */
     $user->setNome($request->getParam('nome'))
-        ->setPassword($request->getParam('password'))
         ->setCep($request->getParam('cep'))
         ->setEndereco($request->getParam('endereco'))
         ->setComplemento($request->getParam('complemento'))
@@ -416,7 +484,6 @@ $app->put('/api/profissional/{id}', function (Request $request, Response $respon
 
     $user->setNome($request->getParam('nome'))
         ->setNome_Fantasia($request->getParam('fantasia'))
-        ->setPassword($request->getParam('password'))
         ->setCep($request->getParam('cep'))
         ->setEndereco($request->getParam('endereco'))
         ->setComplemento($request->getParam('complemento'))
@@ -502,7 +569,7 @@ $app->put('/api/atualiza/aceite/profissional/{id}', function (Request $request, 
     $user = $usersRepository->find($id);   
 
     $user->setStatusAceite($request->getParam('aceite'));
-    $user->setStatusAceite($request->getParam('data'));
+    $user->setDataAceite($request->getParam('data'));
        
     /**
      * Persiste a entidade no banco de dados
@@ -891,12 +958,33 @@ $app->get('/api/consulta/solicitacao/{tipoUsuario}/{idUsuario}/{status}', functi
             $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => $status), array('id' => 'DESC'));
             if($profissional->getAtividade_Extra() != null){
                 $solicitacoes_extra = $repository->findBy(array('atividade' => $profissional->getAtividade_Extra(), 'status' => $status), array('id' => 'DESC'));
-                $result = array_merge($solicitacoes, $solicitacoes_extra);
-                $solicitacoes = $result; 
+               $result = array_merge($solicitacoes, $solicitacoes_extra);
+                $solicitacoes = $result;    
             }
         }
+            $minutos = (int) $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"timeout_solicitacao_minutos"))->getValor();
+            $remove = array();
+            foreach ($solicitacoes as $solicitacao){
+            if($solicitacao->getStatus()!="A"){
+             continue;
+            }
+            	$now = new \DateTimeImmutable('now');
+            	$diferenca = round(abs(strtotime($solicitacao->getDataSolicitacao()->format('Y-m-d H:i:s')) - strtotime($now->format('Y-m-d H:i:s'))) / 60,0);
+            	if($diferenca > $minutos){
+            		$solicitacao->setStatus("E");
+                        $entityManager->persist($solicitacao);
+                        $entityManager->flush();
+                        $remove[] = array_search($solicitacao, $solicitacoes);
+            	}	
+            }
+            foreach($remove as $key){
+            unset($solicitacoes[$key]);
+            }
     }
     
+    usort($solicitacoes, function ($a, $b) {
+    return $a->getid() < $b->getId();
+    });
     $return = $response->withJson($solicitacoes, 200)
         ->withHeader('Content-type', 'application/json');
             return $return;
@@ -956,7 +1044,7 @@ $app->get('/api/consulta/orcamento/{idProfissional}/{idStatus}', function (Reque
     
     $status = $entityManager->getRepository('App\Models\Entity\StatusOrcamento')->find($route->getArgument('idStatus'));
     $profissional = $entityManager->getRepository('App\Models\Entity\Profissional')->find($route->getArgument('idProfissional'));
-    $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional' => $profissional, 'status' => $status));
+    $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional' => $profissional, 'status' => $status), array('id' => 'DESC'));
 
     $return = $response->withJson($orcamentos, 200)
         ->withHeader('Content-type', 'application/json');
@@ -1014,7 +1102,28 @@ $app->get('/api/profissional/avaliacoes/{id}', function (Request $request, Respo
     $orcamentos = $entityManager->getRepository('App\Models\Entity\Orcamento')->findBy(array('profissional' => $route->getArgument('id')));
     
     $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoServico')->findBy(array('orcamento' => $orcamentos));
-    $return = $response->withJson($avaliacoes, 200)
+    $resultados = array();
+    foreach ($avaliacoes as $avaliacao){
+    	$resultado = [
+            'id' => $avaliacao->getId(),
+            'usuario' => $avaliacao->getOrcamento()->getSolicitacao()->getUsuario()->getNome(),
+            'emailCliente' => $avaliacao->getOrcamento()->getSolicitacao()->getUsuario()->getEmail(),
+            'telefoneCliente' => $avaliacao->getOrcamento()->getSolicitacao()->getUsuario()->getTelefone1(),
+            'senha' => $avaliacao->getOrcamento()->getSenha(),
+            'profissional' => $avaliacao->getOrcamento()->getProfissional()->getNome(),
+            'dataAvaliacao' => $avaliacao->getDataTermino(), 
+            'valor' => $avaliacao->getValor(),
+            'pontualidade' => $avaliacao->getPontualidade(),
+            'prazo' => $avaliacao->getPrazo(),
+            'organizacao' => $avaliacao->getOrganizacao(),
+            'atitude' => $avaliacao->getAtitude(),
+            'competencia' => $avaliacao->getCompetencia(),
+            'comentario' => $avaliacao->getComentario(),
+            'atividade' => $avaliacao->getAtividade()->getNome()
+        ];
+        $resultados[]= $resultado;
+    }
+    $return = $response->withJson($resultados, 200)
         ->withHeader('Content-type', 'application/json');
             return $return;
 });
@@ -1022,8 +1131,27 @@ $app->get('/api/profissional/avaliacoes/{id}', function (Request $request, Respo
 $app->get('/api/usuario/avaliacoes/{id}', function (Request $request, Response $response) use ($app,$entityManager) {
     $route = $request->getAttribute('route');
         
-    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoCliente')->findBy(array('usuario' => $route->getArgument('id')));
-    $return = $response->withJson($avaliacoes, 200)
+    $avaliacoes = $entityManager->getRepository('App\Models\Entity\AvaliacaoCliente')->findBy(array('usuario' => $route->getArgument('id')), array('id' => 'DESC'));
+    $resultados = array();
+    foreach ($avaliacoes as $avaliacao){
+    $profissional = $avaliacao->getServico()->getOrcamento()->getProfissional();
+    $senha = $avaliacao->getServico()->getOrcamento()->getSenha();
+    $resultado = [
+            'id' => $avaliacao->getId(),
+            'usuario' => $avaliacao->getUsuario()->getNome(),
+            'profissional'=>$profissional->getNome(),
+            'emailProfissional'=>$profissional->getEmail(),
+            'telefoneProfissional'=>$profissional->getTelefone1(),
+            'senha' => $senha,
+            'dataAvaliacao' => $avaliacao->getDataAvaliacao(),
+            'desisteAdiaCancelaServico' => $avaliacao->getDesisteAdiaCancelaServico(),
+            'pagaCombinado' => $avaliacao->getPagaCombinado(),
+            'exigeAlemCombinado' => $avaliacao->getExigeAlemCombinado(),
+            'comentario' => $avaliacao->getComentario()
+        ];
+    $resultados[]= $resultado;
+    }
+    $return = $response->withJson($resultados, 200)
         ->withHeader('Content-type', 'application/json');
             return $return;
 });
@@ -1274,8 +1402,32 @@ $app->get('/api/consulta/servico/status/{status}/{mes}/{ano}', function (Request
     $qb->setParameter('end', $endDate);
 
     $servicos = $qb->getQuery()->getResult();        
+    
+    $resultados = array();
+    foreach ($servicos as $servico){
+    	$resultado = [
+            'id' => $servico->getId(),
+            'solicitacao' => $servico->getSolicitacao()->getId(),
+            'orcamento' => $servico->getOrcamento()->getId(),
+            'dataInicio' => $servico->getDataInicio(),
+            'valorInicialServico' => $servico->getValorInicialServico(),
+            'valorInicialMaoObra' => $servico->getValorInicialMaoObra(),
+            'prazoInicial' => $servico->getPrazoInicial(),
+            'dataTermino' => $servico->getDataTermino(),
+            'dataPagamento' => $servico->getDataPagamento(),
+            'valorTotalServico' => $servico->getValorTotalServico(),
+            'valorTotalMaoObra' => $servico->getValorTotalMaoObra(),
+            'valorRemunerado' => $servico->getValorRemunerado(),
+            'valorAceiteOrcamento' => $servico->getValorAceiteOrcamento(),
+            'valorDevidoAjustado' => $servico->getValorDevidoAjustado(),
+            'status' => $servico->getStatus(),
+            'senha' => $servico->getOrcamento()->getSenha(),
+            'profissional' => $servico->getOrcamento()->getProfissional()->getNome()
+        ];
+        $resultados[]= $resultado;
+    }
 
-    $return = $response->withJson($servicos, 200)
+    $return = $response->withJson($resultados, 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
 });
@@ -1297,8 +1449,39 @@ $app->get('/api/consulta/pagamento/status/{status}/{mes}/{ano}', function (Reque
     $qb->setParameter('end', $endDate);
 
     $pagamentos = $qb->getQuery()->getResult();        
-
-    $return = $response->withJson($pagamentos, 200)
+     
+     $resultados = array();
+    foreach ($pagamentos as $pagamento){
+    	if($pagamento->getServico()==null){
+       $resultado = [
+            'id' => $pagamento->getId(),
+            'servico' => "",
+            'orcamento' => $pagamento->getOrcamento()->getId(),
+            'profissional' => $pagamento->getProfissional()->getNome(),
+            'tipo' => $pagamento->getTipo(),
+            'dataInclusao' => $pagamento->getDataInclusao(),
+            'valor' => $pagamento->getValor(),
+            'dataEnvio' => $pagamento->getDataEnvio(),
+            'status' => $pagamento->getStatus(),
+            'senha' => $pagamento->getOrcamento()->getSenha()
+        ];
+        }else{
+        $resultado = [
+            'id' => $pagamento->getId(),
+            'servico' => $pagamento->getServico()->getId(),
+            'orcamento' => "",
+            'profissional' => $pagamento->getProfissional()->getNome(),
+            'tipo' => $pagamento->getTipo(),
+            'dataInclusao' => $pagamento->getDataInclusao(),
+            'valor' => $pagamento->getValor(),
+            'dataEnvio' => $pagamento->getDataEnvio(),
+            'status' => $pagamento->getStatus(),
+            'senha' => $pagamento->getServico()->getOrcamento()->getSenha()
+        ];
+        }
+        $resultados[]= $resultado;
+    }
+    $return = $response->withJson($resultados, 200)
         ->withHeader('Content-type', 'application/json');
     return $return;
 });
@@ -1326,5 +1509,87 @@ $app->post('/api/cadastro/administrador', function (Request $request, Response $
     return $return;
 });
 
+$app->post('/api/efetua/pagamento', function (Request $request, Response $response) use ($app,$entityManager) {
+
+    $pagamento = $entityManager->getRepository('App\Models\Entity\Pagamento')->find($request->getParam('pagamento'));
+
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+    CURLOPT_URL => 'https://sandbox.moip.com.br/v2/orders',
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => [
+        'Authorization: Basic S1NXSkRXU0VNNVlTQkcwWDVQQkhWRVZUSlIzUk9ITVk6QlVaWlNGUVRDVERaSEtTTFA2QUZEU1JYTjZDSTMyQlJaT0ZTQ1NCWA==',
+        'Content-Type: application/json',
+        'x-li-format: json'
+    ],
+    CURLOPT_POSTFIELDS => json_encode([
+        'ownId' => $pagamento->getId(),
+        'items' => [[
+	    'product'=> $pagamento->getServico()->getSolicitacao()->getAtividade()->getNome(),
+            'quantity'=> 1,
+            'detail'=> $pagamento->getServico()->getSolicitacao()->getTextoSolicitacao(),
+            'price'=> $pagamento->getValor()
+        ]],
+        'customer'=> [
+         'ownId'=> $pagamento->getProfissional()->getId(),
+         'fullname'=> $pagamento->getProfissional()->getNome(),
+         'email'=> $pagamento->getProfissional()->getEmail()
+  ]
+  ]),
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_PROTOCOLS => CURLPROTO_HTTPS
+]);
+
+$resultado = curl_exec($ch);
+$pedido = json_decode($resultado);
+curl_close($ch);
+
+ $ch = curl_init();
+    curl_setopt_array($ch, [
+    CURLOPT_URL => 'https://sandbox.moip.com.br/v2/orders/'.$pedido->id.'/payments',
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => [
+        'Authorization: Basic S1NXSkRXU0VNNVlTQkcwWDVQQkhWRVZUSlIzUk9ITVk6QlVaWlNGUVRDVERaSEtTTFA2QUZEU1JYTjZDSTMyQlJaT0ZTQ1NCWA==',
+        'Content-Type: application/json',
+        'x-li-format: json'
+    ],
+    CURLOPT_POSTFIELDS => json_encode(
+    [
+      'installmentCount'=>2,
+      'fundingInstrument'=>[
+        'method'=>'CREDIT_CARD',
+        'creditCard'=>[
+          'expirationMonth'=>12,
+          'expirationYear'=> 25,
+          'number'=> '5555666677778884',
+          'cvc'=> '123',
+          'holder'=>[
+            'fullname'=>$pagamento->getProfissional()->getNome(),
+            'birthdate'=>'1988-12-30',
+            'taxDocument'=>[
+              'type'=>'CPF',
+              'number'=>$pagamento->getProfissional()->getCpf()
+            ],
+            'phone'=>[
+              'countryCode'=>'55',
+              'areaCode'=>substr($pagamento->getProfissional()->getTelefone1(),0,-9),
+              'number'=> substr($pagamento->getProfissional()->getTelefone1(),2)
+            ]
+          ]
+        ]
+      ]
+    ]),
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_PROTOCOLS => CURLPROTO_HTTPS
+]);
+
+$resultado = curl_exec($ch);
+$pagamento = json_decode($resultado);
+curl_close($ch);
+
+    $return = $response->withJson($pagamento, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
 
 $app->run();
