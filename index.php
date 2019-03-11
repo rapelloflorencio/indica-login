@@ -765,6 +765,7 @@ $app->post('/api/login', function (Request $request, Response $response) use ($a
             
             $atividade->setNome($request->getParam('nome'));
             $atividade->setMneumonico($request->getParam('mneumonico'));
+            $atividade->setAtiva($request->getParam('ativa'));
         
             $entityManager->persist($atividade);
             $entityManager->flush();        
