@@ -928,3 +928,11 @@
 [05-Mar-2019 16:24:13 America/Chicago] PHP Parse error:  syntax error, unexpected '->' (T_OBJECT_OPERATOR), expecting ',' or ')' in /home1/indicaer/public_html/indica-login/index.php on line 972
 [05-Mar-2019 16:27:06 America/Chicago] PHP Parse error:  syntax error, unexpected '->' (T_OBJECT_OPERATOR), expecting ',' or ')' in /home1/indicaer/public_html/indica-login/index.php on line 972
 [05-Mar-2019 19:31:10 America/Sao_Paulo] PHP Recoverable fatal error:  Object of class App\Models\Entity\SolicitacaoOrcamento could not be converted to string in /home1/indicaer/public_html/indica-login/index.php on line 980
+[14-Mar-2019 00:50:27 America/Sao_Paulo] PHP Warning:  usort() expects parameter 1 to be array, null given in /home1/indicaer/public_html/indica-login/index.php on line 985
+[17-Mar-2019 19:20:47 America/Sao_Paulo] PHP Warning:  Division by zero in /home1/indicaer/public_html/indica-login/index.php on line 1299
+[17-Mar-2019 19:22:29 America/Sao_Paulo] PHP Warning:  Division by zero in /home1/indicaer/public_html/indica-login/index.php on line 1299
+[17-Mar-2019 19:22:43 America/Sao_Paulo] PHP Warning:  Division by zero in /home1/indicaer/public_html/indica-login/index.php on line 1299
+[17-Mar-2019 19:38:21 America/Sao_Paulo] PHP Warning:  Division by zero in /home1/indicaer/public_html/indica-login/index.php on line 1299
+[17-Mar-2019 19:38:31 America/Sao_Paulo] PHP Warning:  Division by zero in /home1/indicaer/public_html/indica-login/index.php on line 1299
+[17-Mar-2019 23:48:10 America/Sao_Paulo] PHP Recoverable fatal error:  Object of class DoctrineProxies\__CG__\App\Models\Entity\Profissional could not be converted to string in /home1/indicaer/public_html/indica-login/index.php on line 1281
+[17-Mar-2019 23:49:11 America/Sao_Paulo] PHP Recoverable fatal error:  Object of class DoctrineProxies\__CG__\App\Models\Entity\Profissional could not be converted to string in /home1/indicaer/public_html/indica-login/index.php on line 1281

@@ -942,7 +942,12 @@ $app->get('/api/consulta/solicitacao/{tipoUsuario}/{idUsuario}/{status}', functi
         $usuario = $usersRepository->find($idUsuario);
         if($status == "T"){
             $solicitacoes = $repository->findBy(array('usuario' => $usuario), array('id' => 'DESC')); 
-        } else{
+        } else if($status == "A"){
+            $solicitacoes = $repository->findBy(array('usuario' => $usuario, 'status' => $status), array('id' => 'DESC'));
+            $solicitacoesExpiradas = $repository->findBy(array('usuario' => $usuario, 'status' => 'E'), array('id' => 'DESC'));
+            $result = array_merge($solicitacoes, $solicitacoesExpiradas);
+                $solicitacoes = $result;  
+        }else{
             $solicitacoes = $repository->findBy(array('usuario' => $usuario, 'status' => $status), array('id' => 'DESC'));
         }
     }elseif($tipoUsuario == "profissional"){
@@ -957,14 +962,18 @@ $app->get('/api/consulta/solicitacao/{tipoUsuario}/{idUsuario}/{status}', functi
         }
         } else{
             $solicitacoes = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => $status), array('id' => 'DESC'));
+            $solicitacoesExpiradas = $repository->findBy(array('atividade' => $profissional->getAtividade_Principal(), 'status' => 'E'), array('id' => 'DESC'));
+            $result1 = array_merge($solicitacoes, $solicitacoesExpiradas);
+            $solicitacoes = $result1;    
             if($profissional->getAtividade_Extra() != null){
                 $solicitacoes_extra = $repository->findBy(array('atividade' => $profissional->getAtividade_Extra(), 'status' => $status), array('id' => 'DESC'));
-               $result = array_merge($solicitacoes, $solicitacoes_extra);
+                $solicitacoes_extra_expiradas = $repository->findBy(array('atividade' => $profissional->getAtividade_Extra(), 'status' => 'E'), array('id' => 'DESC'));
+               $result2 = array_merge($solicitacoes_extra, $solicitacoes_extra_expiradas);
+               $result = array_merge($solicitacoes, $result2);
                 $solicitacoes = $result;    
             }
         }
             $minutos = (int) $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"timeout_solicitacao_minutos"))->getValor();
-            $remove = array();
             foreach ($solicitacoes as $solicitacao){
             if($solicitacao->getStatus()!="A"){
              continue;
@@ -975,11 +984,7 @@ $app->get('/api/consulta/solicitacao/{tipoUsuario}/{idUsuario}/{status}', functi
             		$solicitacao->setStatus("E");
                         $entityManager->persist($solicitacao);
                         $entityManager->flush();
-                        $remove[] = array_search($solicitacao, $solicitacoes);
             	}	
-            }
-            foreach($remove as $key){
-            unset($solicitacoes[$key]);
             }
     }
     
@@ -1016,6 +1021,19 @@ $app->post('/api/gravar/orcamento', function (Request $request, Response $respon
     $profissional = $entityManager->getRepository('App\Models\Entity\Profissional')->find($params->profissional);
     $valor = $params->valor;
     $descricao = $params->descricao;
+    
+    $minutos = (int) $entityManager->getRepository('App\Models\Entity\Parametro')->findOneBy(array('nome'=>"timeout_solicitacao_minutos"))->getValor();
+    $now = new \DateTimeImmutable('now');
+    $diferenca = round(abs(strtotime($solicitacao->getDataSolicitacao()->format('Y-m-d H:i:s')) - strtotime($now->format('Y-m-d H:i:s'))) / 60,0);
+    if($diferenca > $minutos){
+    	$solicitacao->setStatus("E");
+        $entityManager->persist($solicitacao);
+        $entityManager->flush();
+        $return = $response->withJson(['mensagem'=>"Não foi possível aceitar Orçamento, Solicitação com timeout expirado."], 409)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+    }	
+           
 
     $orcamento = new Orcamento($status, $solicitacao, $profissional, $valor, $descricao);
 
@@ -1425,6 +1443,86 @@ $app->get('/api/consulta/servico/status/{status}/{mes}/{ano}', function (Request
             'senha' => $servico->getOrcamento()->getSenha(),
             'profissional' => $servico->getOrcamento()->getProfissional()->getNome()
         ];
+        $resultados[]= $resultado;
+    }
+
+    $return = $response->withJson($resultados, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;
+});
+
+$app->get('/api/consulta/relatorio/servicos/{dataInicio}/{dataFim}', function (Request $request, Response $response) use ($app,$entityManager) {
+    $route = $request->getAttribute('route');
+    $repository = $entityManager->getRepository('App\Models\Entity\Servico');
+    
+    $dataInicio = $route->getArgument('dataInicio');
+    $dataFim = $route->getArgument('dataFim');
+    
+    $startDate = new \DateTimeImmutable($dataInicio."T00:00:00");
+    $endDate = new \DateTimeImmutable($dataFim."T23:59:59");
+
+    $qb = $entityManager->getRepository('App\Models\Entity\Orcamento')->createQueryBuilder('orcamento');
+    $qb->where('orcamento.data BETWEEN :start AND :end');
+    $qb->setParameter('start', $startDate);
+    $qb->setParameter('end', $endDate);
+
+    $orcamentos = $qb->getQuery()->getResult();        
+    
+    $resultados = array();
+    foreach ($orcamentos as $orcamento){
+	$dataOrcamento1 = "";
+	$dataOrcamento2 = "";
+	if($orcamento->getSolicitacao()->getOrcamento1()->getId()==$orcamento->getId()){
+  	    $dataOrcamento1 = $orcamento->getData();   
+	} 
+	if($orcamento->getSolicitacao()->getOrcamento2()!=null){
+	if($orcamento->getSolicitacao()->getOrcamento2()->getId()==$orcamento->getId()){
+  	    $dataOrcamento2 = $orcamento->getData();
+	   }
+	} 
+	$servico = $repository->findOneBy(array('orcamento'=>$orcamento));
+	$resultado = null;
+	if($servico!=null){
+    	$resultado = [
+    	    'idSolicitacao' => $orcamento->getSolicitacao()->getId(),
+            'nome' => $orcamento->getProfissional()->getNome(),
+            'senha' => $orcamento->getSenha(),
+            'dataAceiteOrcamento1' => $dataOrcamento1,
+            'dataAceiteOrcamento2' => $dataOrcamento2,
+            'dataInicio' => $servico->getDataInicio(),
+            'valorInicialServico' => $servico->getValorInicialServico(),
+            'valorInicialMaoObra' => $servico->getValorInicialMaoObra(),
+            'prazoInicial' => $servico->getPrazoInicial(),
+            'dataTermino' => $servico->getDataTermino(),
+            'dataPagamento' => $servico->getDataPagamento(),
+            'valorTotalServico' => $servico->getValorTotalServico(),
+            'valorTotalMaoObra' => $servico->getValorTotalMaoObra(),
+            'valorRemunerado' => $servico->getValorRemunerado(),
+            'valorAceiteOrcamento' => $servico->getValorAceiteOrcamento(),
+            'valorDevidoAjustado' => $servico->getValorDevidoAjustado(),
+            'status' => $servico->getStatus()
+        ];
+        }else{
+         $resultado = [
+            'idSolicitacao' => $orcamento->getSolicitacao()->getId(),
+            'nome' => $orcamento->getProfissional()->getNome(),
+            'senha' => $orcamento->getSenha(),
+            'dataAceiteOrcamento1' => $dataOrcamento1,
+            'dataAceiteOrcamento2' => $dataOrcamento2,
+            'dataInicio' => '',
+            'valorInicialServico' => '',
+            'valorInicialMaoObra' => '',
+            'prazoInicial' => '',
+            'dataTermino' => '',
+            'dataPagamento' => '',
+            'valorTotalServico' => '',
+            'valorTotalMaoObra' => '',
+            'valorRemunerado' => '',
+            'valorAceiteOrcamento' => '',
+            'valorDevidoAjustado' => '',
+            'status' => ''
+        ];   
+        }
         $resultados[]= $resultado;
     }
 
