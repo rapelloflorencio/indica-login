@@ -131,23 +131,13 @@ class CartaoCredito implements \JsonSerializable
 
     public function getDataNascimento(): string
     {
-        return $this->nome;
+        return $this->dataNascimento;
     }
 
 
     public function getRegisteredAt(): \DateTimeImmutable
     {
         return $this->registeredAt;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function getTelefone(): string
-    {
-        return $this->telefone;
     }
 
     public function setNome($nome){
